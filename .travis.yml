@@ -4,10 +4,13 @@ sudo: required
 #   - ARCH_TRAVIS_VERBOSE=1
 
 arch:
+  pacman:
+    - screenfetch
   aur:
     - archey3-git
   script:
     - "sudo archey3"
+    - "sudo screenfetch"
 
 script:
   - "curl -s https://raw.githubusercontent.com/mikkeloscar/arch-travis/master/arch-travis.sh | bash"
