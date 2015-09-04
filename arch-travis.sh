@@ -30,10 +30,6 @@ user_home="/home/$user"
 # default packages
 default_packages=("base-devel" "ruby" "git")
 
-# set default locale
-export LANG=C
-export LC_ALL=C
-
 # setup working Arch Linux chroot
 setup_chroot() {
   echo ":: Setting up Arch chroot..."
@@ -73,6 +69,10 @@ setup_chroot() {
   # update packages
   chroot_as_root "pacman -Syy"
   chroot_as_root "pacman -Syu ${default_packages[*]} --noconfirm"
+
+  # use LANG=en_US.UTF-8 as expected in travis env
+  sudo sed -i "s|#en_US.UTF-8|en_US.UTF-8|" $ARCH_TRAVIS_CHROOT/etc/locale.gen
+  chroot_as_root "locale-gen"
 
   # setup non-root user
   chroot_as_root "useradd -m -s /bin/bash $user"
@@ -116,7 +116,7 @@ chroot_as_root() {
 
 # run command in chroot as normal user
 chroot_as_normal() {
-  local cmd="sudo chroot --userspec=$user:$user $ARCH_TRAVIS_CHROOT /bin/bash -c 'export HOME=$user_home && cd $user_home && $1'"
+  local cmd="sudo chroot --userspec=$user:$user $ARCH_TRAVIS_CHROOT /bin/bash -c 'export HOME=$user_home USER=$user && cd $user_home && $1'"
   if [ -n "$ARCH_TRAVIS_VERBOSE" ]; then
     verbose $cmd
   else
@@ -151,7 +151,7 @@ output() {
 # run build script
 run_build_script() {
   echo "$ $1"
-  sudo chroot --userspec=$user:$user $ARCH_TRAVIS_CHROOT /bin/bash -c "export HOME=$user_home && cd $user_home && $1"
+  sudo chroot --userspec=$user:$user $ARCH_TRAVIS_CHROOT /bin/bash -c "export HOME=$user_home USER=$user && cd $user_home && $1"
   local ret=$?
 
   if [ $ret -gt 0 ]; then
