@@ -108,7 +108,7 @@ chroot_as_root() {
 }
 
 chroot_as_normal() {
-  local cmd="sudo chroot --userspec=$user:$user $ARCH_TRAVIS_CHROOT /bin/bash -c 'cd $user_home && $1'"
+  local cmd="sudo chroot --userspec=$user:$user $ARCH_TRAVIS_CHROOT /bin/bash -c 'export HOME=$user_home && cd $user_home && $1'"
   if [ -n "$ARCH_TRAVIS_VERBOSE" ]; then
     verbose $cmd
   else
@@ -139,7 +139,7 @@ output() {
 
 run_build_script() {
   echo "$ $1"
-  sudo chroot --userspec=$user:$user $ARCH_TRAVIS_CHROOT /bin/bash -c "cd $user_home && $1"
+  sudo chroot --userspec=$user:$user $ARCH_TRAVIS_CHROOT /bin/bash -c "export HOME=$user_home && cd $user_home && $1"
   local ret=$?
 
   if [ $ret -gt 0 ]; then
@@ -194,7 +194,14 @@ travis_yml() {
 
 check_travis_yml() {
   out=$(travis_yml "$@" 2>&1)
-  echo $?
+  local ret=$?
+  if [ $ret -gt 0 ]; then
+    echo $ret
+  elif [ -z "$out" ]; then
+    echo 2
+  else
+    echo 0
+  fi
 }
 
 build_scripts() {
@@ -208,6 +215,7 @@ build_scripts() {
     IFS=$old_ifs
   else
     echo "No build scripts defined"
+    takedown_chroot
     exit 1
   fi
 }
