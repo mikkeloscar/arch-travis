@@ -33,7 +33,7 @@ export LC_ALL=C
 
 # setup working Arch Linux chroot
 setup_chroot() {
-  echo ":: Setting up arch chroot..."
+  echo ":: Setting up Arch chroot..."
 
   if [ ! -f $archive ]; then
     # get root fs
