@@ -2,7 +2,7 @@
 
 [![Travis BuildStatus](https://travis-ci.org/mikkeloscar/arch-travis.svg?branch=master)](https://travis-ci.org/mikkeloscar/arch-travis)
 
-Arch linux build environment for [Travis-CI][travis-ci].
+Arch Linux build environment for [Travis-CI][travis-ci].
 
 ## LICENSE
 Copyright (C) 2015  Mikkel Oscar Lyderik Larsen
