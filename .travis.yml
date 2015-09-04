@@ -1,7 +1,7 @@
 sudo: required
 
-env:
-  - ARCH_TRAVIS_VERBOSE=1
+# env:
+#   - ARCH_TRAVIS_VERBOSE=1
 
 arch:
   aur:
