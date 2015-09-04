@@ -27,6 +27,9 @@ ARCH_TRAVIS_CHROOT=${ARCH_TRAVIS_CHROOT:-"$default_root"}
 user="travis"
 user_home="/home/$user"
 
+# default packages
+default_packages=("base-devel" "ruby" "git")
+
 # set default locale
 export LANG=C
 export LC_ALL=C
@@ -69,7 +72,7 @@ setup_chroot() {
 
   # update packages
   chroot_as_root "pacman -Syy"
-  chroot_as_root "pacman -Syu base-devel ruby git --noconfirm"
+  chroot_as_root "pacman -Syu ${default_packages[*]} --noconfirm"
 
   # setup non-root user
   chroot_as_root "useradd -m -s /bin/bash $user"
