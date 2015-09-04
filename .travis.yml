@@ -5,6 +5,7 @@ sudo: required
 
 arch:
   pacman:
+    - procps-ng # required by screenfetch
     - screenfetch
   aur:
     - archey3-git
