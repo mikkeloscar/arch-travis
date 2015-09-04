@@ -69,7 +69,7 @@ setup_chroot() {
 
   # update packages
   chroot_as_root "pacman -Syy"
-  chroot_as_root "pacman -Syu base-devel ruby --noconfirm"
+  chroot_as_root "pacman -Syu base-devel ruby git --noconfirm"
 
   # setup non-root user
   chroot_as_root "useradd -m -s /bin/bash $user"
