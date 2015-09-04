@@ -1,6 +1,4 @@
-# arch-travis
-
-[![Travis BuildStatus](https://travis-ci.org/mikkeloscar/arch-travis.svg?branch=master)](https://travis-ci.org/mikkeloscar/arch-travis)
+# arch-travis [![Travis BuildStatus](https://travis-ci.org/mikkeloscar/arch-travis.svg?branch=master)](https://travis-ci.org/mikkeloscar/arch-travis)
 
 arch-travis provides a chroot based Arch Linux build environment for
 [Travis-CI][travis-ci] builds. It supports a very simple (and limited)
