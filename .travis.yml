@@ -1,5 +1,8 @@
 sudo: required
 
+env:
+  - ARCH_TRAVIS_VERBOSE=1
+
 arch:
   aur:
     - archey3-git
