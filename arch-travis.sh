@@ -16,7 +16,7 @@
 
 
 # Script for setting up and running a travis-ci build in an up to date
-# ArchLinux chroot
+# Arch Linux chroot
 
 ARCH_TRAVIS_MIRROR=${ARCH_TRAVIS_MIRROR:-"https://ftp.lysator.liu.se/pub/archlinux"}
 ARCH_TRAVIS_ARCH_ISO=${ARCH_TRAVIS_ARCH_ISO:-"2015.09.01"}
@@ -31,6 +31,7 @@ user_home="/home/$user"
 export LANG=C
 export LC_ALL=C
 
+# setup working Arch Linux chroot
 setup_chroot() {
   echo ":: Setting up arch chroot..."
 
@@ -80,6 +81,7 @@ setup_chroot() {
   setup_pacaur
 }
 
+# run command as normal user
 as_normal() {
   local cmd="/bin/bash -c '$1'"
   if [ -n "$ARCH_TRAVIS_VERBOSE" ]; then
@@ -89,6 +91,7 @@ as_normal() {
   fi
 }
 
+# run command as root
 as_root() {
   local cmd="sudo /bin/bash -c '$1'"
   if [ -n "$ARCH_TRAVIS_VERBOSE" ]; then
@@ -98,6 +101,7 @@ as_root() {
   fi
 }
 
+# run command in chroot as root
 chroot_as_root() {
   local cmd="sudo chroot $ARCH_TRAVIS_CHROOT /bin/bash -c '$1'"
   if [ -n "$ARCH_TRAVIS_VERBOSE" ]; then
@@ -107,6 +111,7 @@ chroot_as_root() {
   fi
 }
 
+# run command in chroot as normal user
 chroot_as_normal() {
   local cmd="sudo chroot --userspec=$user:$user $ARCH_TRAVIS_CHROOT /bin/bash -c 'export HOME=$user_home && cd $user_home && $1'"
   if [ -n "$ARCH_TRAVIS_VERBOSE" ]; then
@@ -116,6 +121,7 @@ chroot_as_normal() {
   fi
 }
 
+# run command in verbose mode
 verbose() {
   eval $@
   local ret=$?
@@ -126,6 +132,8 @@ verbose() {
   fi
 }
 
+# run command in default mode
+# Any output is suppressed unless the command returns with an error
 output() {
   out=$(eval $@ 2>&1)
   local ret=$?
@@ -137,6 +145,7 @@ output() {
   fi
 }
 
+# run build script
 run_build_script() {
   echo "$ $1"
   sudo chroot --userspec=$user:$user $ARCH_TRAVIS_CHROOT /bin/bash -c "export HOME=$user_home && cd $user_home && $1"
@@ -148,6 +157,7 @@ run_build_script() {
   fi
 }
 
+# setup pacaur
 setup_pacaur() {
   local cowerarchive="cower.tar.gz"
   local aururl="https://aur.archlinux.org/cgit/aur.git/snapshot/"
@@ -164,29 +174,36 @@ setup_pacaur() {
   chroot_as_normal "rm -rf pacaur"
 }
 
+# install package through pacaur
 _pacaur() {
   local pacaur="pacaur -S $@ --noconfirm --noedit"
   chroot_as_normal "$pacaur"
 }
 
+# takedown chroot
+# unmounts anything mounted in the chroot setup
 takedown_chroot() {
   sudo umount $ARCH_TRAVIS_CHROOT/{run,dev/shm,dev/pts,dev,sys,proc}
   sudo umount $ARCH_TRAVIS_CHROOT
 }
 
+# copy .travis.yml to chroot
 copy_travis_yml() {
   cp -a .travis.yml $ARCH_TRAVIS_CHROOT$user_home
 }
 
+# copy working dir to chroot
 copy_cwd() {
   rsync -a --exclude=$ARCH_TRAVIS_CHROOT --exclude=$archive . $ARCH_TRAVIS_CHROOT$user_home
 }
 
+# read value from .travis.yml
 travis_yml() {
   local cmd="ruby -ryaml -e 'puts ARGV[1..-1].inject(YAML.load(File.read(ARGV[0]))) {|acc, key| acc[key] }' .travis.yml $@"
   sudo chroot --userspec=$user:$user $ARCH_TRAVIS_CHROOT /bin/bash -c "cd $user_home && $cmd"
 }
 
+# check for config in .travis.yml
 check_travis_yml() {
   out=$(travis_yml "$@" 2>&1)
   local ret=$?
@@ -199,6 +216,7 @@ check_travis_yml() {
   fi
 }
 
+# run build scripts defined in .travis.yml
 build_scripts() {
   local valid=$(check_travis_yml arch script)
   if [ $valid -eq 0 ]; then
@@ -215,6 +233,7 @@ build_scripts() {
   fi
 }
 
+# install packages defined in .travis.yml
 install_packages() {
   local valid=$(check_travis_yml arch packages)
   if [ $valid -eq 0 ]; then
