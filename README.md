@@ -64,6 +64,14 @@ mirrors [here][arch-mirros]. (default is
 `ARCH_TRAVIS_ARCH_ISO` Arch iso date from which the chroot is bootstraped.
 (default is the latest iso date, updated about once a month).
 
+To use, just add the variable to the `env` section of `.travis.yml`.
+
+```yml
+env:
+  - ARCH_TRAVIS_VERBOSE=1
+  - ARCH_TRAVIS_CHROOT="custom_root"
+```
+
 ## LICENSE
 Copyright (C) 2015  Mikkel Oscar Lyderik Larsen
 
