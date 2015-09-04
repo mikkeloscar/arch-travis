@@ -7,7 +7,7 @@ arch:
   aur:
     - archey3-git
   script:
-    - "archey3"
+    - "sudo archey3"
 
 script:
   - "curl -s https://raw.githubusercontent.com/mikkeloscar/arch-travis/master/arch-travis.sh | bash"
