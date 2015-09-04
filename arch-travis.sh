@@ -164,14 +164,9 @@ setup_pacaur() {
   chroot_as_normal "rm -rf pacaur"
 }
 
-_aur() {
-  local pacaur="pacaur -y $@ --noconfirm --noedit"
+_pacaur() {
+  local pacaur="pacaur -S $@ --noconfirm --noedit"
   chroot_as_normal "$pacaur"
-}
-
-_pacman() {
-  local pacman="pacman -S $@ --noconfirm"
-  chroot_as_root "$pacman"
 }
 
 takedown_chroot() {
@@ -221,16 +216,9 @@ build_scripts() {
 }
 
 install_packages() {
-  local valid=$(check_travis_yml arch $1)
+  local valid=$(check_travis_yml arch packages)
   if [ $valid -eq 0 ]; then
-    case $1 in
-      pacman)
-        _pacman $(travis_yml arch $1)
-        ;;
-      aur)
-        _aur $(travis_yml arch $1)
-        ;;
-    esac
+    _pacaur $(travis_yml arch packages)
   fi
 }
 
@@ -238,8 +226,7 @@ setup_chroot
 
 copy_travis_yml
 
-install_packages "pacman"
-install_packages "aur"
+install_packages
 
 copy_cwd
 

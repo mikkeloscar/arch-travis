@@ -4,10 +4,10 @@ sudo: required
 #   - ARCH_TRAVIS_VERBOSE=1
 
 arch:
-  pacman:
+  packages:
     - procps-ng # required by screenfetch
     - screenfetch
-  aur:
+    # aur
     - archey3-git
   script:
     - "sudo archey3"
