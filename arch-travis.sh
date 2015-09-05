@@ -98,6 +98,7 @@ setup_chroot() {
 # add custom repositories to pacman.conf
 add_repositories() {
   local valid=$(check_travis_yml arch repos)
+  echo $valid
   if [ $valid -eq 0 ]; then
     for r in $(travis_yml arch repos); do
       local splitarr=(${r//=/ })
@@ -110,6 +111,8 @@ add_repositories() {
 
     # update repos
     chroot_as_root "pacman -Syy"
+  else
+    echo "FAILED!!!"
   fi
 }
 
