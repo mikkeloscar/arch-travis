@@ -26,6 +26,8 @@ script:
   - "curl -s https://raw.githubusercontent.com/mikkeloscar/arch-travis/master/arch-travis.sh | bash"
 ```
 
+`arch.repos` defines a list of custom repositories.
+
 `arch.packages` defines a list of packages (from official repos or AUR) to be
 installed before running the build.
 
