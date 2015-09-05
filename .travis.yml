@@ -19,4 +19,4 @@ arch:
     - "sudo screenfetch"
 
 script:
-  - "curl -s https://raw.githubusercontent.com/mikkeloscar/arch-travis/master/arch-travis.sh | bash"
+  - "bash ./arch-travis.sh"
