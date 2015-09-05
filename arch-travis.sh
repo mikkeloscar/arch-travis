@@ -89,6 +89,8 @@ setup_chroot() {
   # add custom repos
   add_repositories
 
+  cat $ARCH_TRAVIS_CHROOT/etc/pacman.conf
+
   # setup pacaur for AUR packages
   setup_pacaur
 }
