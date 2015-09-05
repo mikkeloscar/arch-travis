@@ -9,12 +9,16 @@ Example:
 sudo: required
 
 arch:
+  repos:
+    - papyros=http://dash.papyros.io/repos/$repo/$arch
   packages:
     # pacman packages
     - python
     - perl
     # aur packages
     - go-git
+    # packages from papyros repo
+    - papyros-shell
   script:
     - "./build_script.sh"
 
@@ -33,7 +37,7 @@ installed in the setup.
 `script` defines the scripts to be run by travis, this is where arch-travis is
 initialized.
 
-### Default packages
+### Default packages adn repos
 
 By default the following packages are installed and usable from within the
 build environment.
@@ -43,6 +47,25 @@ build environment.
 * [git](https://www.archlinux.org/packages/extra/x86_64/git/)
 * [cower](https://aur.archlinux.org/packages/cower/)
 * [pacaur](https://aur.archlinux.org/packages/pacaur/)
+
+The following repositories are enabled by default.
+
+* core
+* extra
+* community
+* multilib
+
+It is possible to use custom respositories by adding them to the `arch.repos`
+section of `.travis.yml` using the following format:
+
+```yml
+arch:
+  repos:
+    - repo-name=http://repo.com/path
+```
+
+The first repository in the list will be added first in `pacman.conf` and all
+custom repositories will be added before the default repositories.
 
 ### Limitations/tradeoffs
 
