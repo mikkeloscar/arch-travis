@@ -37,7 +37,7 @@ installed in the setup.
 `script` defines the scripts to be run by travis, this is where arch-travis is
 initialized.
 
-### Default packages adn repos
+### Default packages and repos
 
 By default the following packages are installed and usable from within the
 build environment.
