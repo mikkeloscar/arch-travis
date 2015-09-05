@@ -4,9 +4,9 @@ sudo: required
 #   - ARCH_TRAVIS_VERBOSE=1
 
 arch:
-  repos:
-    - xyne-any=http://xyne.archlinux.ca/repos/xyne
-    - papyros=http://dash.papyros.io/repos/$repo/$arch
+  # repos:
+  #   - xyne-any=http://xyne.archlinux.ca/repos/xyne
+  #   - papyros=http://dash.papyros.io/repos/$repo/$arch
   packages:
     - procps-ng # required by screenfetch
     - screenfetch
