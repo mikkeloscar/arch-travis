@@ -30,6 +30,9 @@ user_home="/home/$user"
 # default packages
 default_packages=("base-devel" "ruby" "git")
 
+# pacman.conf repository line
+repo_line=70
+
 # setup working Arch Linux chroot
 setup_chroot() {
   echo ":: Setting up Arch chroot..."
@@ -50,7 +53,7 @@ setup_chroot() {
   sudo sed -i "s|SigLevel    = Required DatabaseOptional|SigLevel = Never|" $ARCH_TRAVIS_CHROOT/etc/pacman.conf
 
   # enable multilib
-  sudo sed -i "N;s|#[multilib]\n#Include|[multilib]\nInclude|" $ARCH_TRAVIS_CHROOT/etc/pacman.conf
+  sudo sed -i 's|#\[multilib\]|\[multilib\]\nInclude = /etc/pacman.d/mirrorlist|' $ARCH_TRAVIS_CHROOT/etc/pacman.conf
 
   # add mirror
   as_root "echo $mirror_entry >> $ARCH_TRAVIS_CHROOT/etc/pacman.d/mirrorlist"
@@ -70,7 +73,7 @@ setup_chroot() {
   chroot_as_root "pacman -Syy"
   chroot_as_root "pacman -Syu ${default_packages[*]} --noconfirm"
 
-  # use LANG=en_US.UTF-8 as expected in travis env
+  # use LANG=en_US.UTF-8 as expected in travis environments
   sudo sed -i "s|#en_US.UTF-8|en_US.UTF-8|" $ARCH_TRAVIS_CHROOT/etc/locale.gen
   chroot_as_root "locale-gen"
 
@@ -80,8 +83,32 @@ setup_chroot() {
   # disable password for sudo users
   as_root "echo \"$user ALL=(ALL) NOPASSWD: ALL\" >> $ARCH_TRAVIS_CHROOT/etc/sudoers.d/$user"
 
+  # copy .travis.yml for access in chroot
+  copy_travis_yml
+
+  # add custom repos
+  add_repositories
+
   # setup pacaur for AUR packages
   setup_pacaur
+}
+
+# add custom repositories to pacman.conf
+add_repositories() {
+  local valid=$(check_travis_yml arch repos)
+  if [ $valid -eq 0 ]; then
+    for r in $(travis_yml arch repos); do
+      local splitarr=(${r//=/ })
+      ((repo_line+=1))
+      sudo sed -i "${repo_line}i[${splitarr[0]}]" $ARCH_TRAVIS_CHROOT/etc/pacman.conf
+      ((repo_line+=1))
+      sudo sed -i "${repo_line}iServer = ${splitarr[1]}\n" $ARCH_TRAVIS_CHROOT/etc/pacman.conf
+      ((repo_line+=1))
+    done
+
+    # update repos
+    chroot_as_root "pacman -Syy"
+  fi
 }
 
 # run command as normal user
@@ -245,8 +272,6 @@ install_packages() {
 }
 
 setup_chroot
-
-copy_travis_yml
 
 install_packages
 
