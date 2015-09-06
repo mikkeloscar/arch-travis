@@ -63,8 +63,7 @@ section of `.travis.yml` using the following format:
 ```yml
 arch:
   repos:
-    - repo-name=http://repo.com/path # omit the /$repo/os/$arch part of the
-                                     # mirror url
+    - repo-name=http://repo.com/path
 ```
 
 The first repository in the list will be added first in `pacman.conf` and all
