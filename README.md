@@ -75,7 +75,7 @@ custom repositories will be added before the default repositories.
 * Doesn't work on [travis container-based infrastructure][travis-container] because `sudo` is required.
 * Limited configuration.
 * Doesn't include `base` group packages. If you need anything
-  from `base` please list it in the `arch.packages` list of `.travis.yml`.
+  from `base` just add it to the `arch.packages` list in `.travis.yml`.
 
 ## Advanced configuration
 
