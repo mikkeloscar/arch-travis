@@ -92,8 +92,10 @@ suppressed and only displayed if one of the setup commands fails. By setting
 `root.x86_64`).
 
 `ARCH_TRAVIS_MIRROR` Arch Linux mirror used by pacman. See list of available
-mirrors [here][arch-mirrors]. (default is
-`https://ftp.lysator.liu.se/pub/archlinux`)
+mirrors [here][arch-mirrors]. Omit the `/$repo/os/$arch` part of the mirror
+when defining this variable. (default is `https://ftp.lysator.liu.se/pub/archlinux`)
+
+> Note some https mirrors are not supported due to [#4757][travis-issue-4757].
 
 `ARCH_TRAVIS_ARCH_ISO` Arch iso date from which the chroot is bootstraped.
 (default is the latest iso date, updated about once a month).
@@ -125,3 +127,4 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 [travis-ci]: https://travis-ci.org
 [travis-container]: http://docs.travis-ci.com/user/workers/container-based-infrastructure/
 [arch-mirrors]: https://www.archlinux.org/mirrorlist/all/
+[travis-issue-4757]: https://github.com/travis-ci/travis-ci/issues/4757
