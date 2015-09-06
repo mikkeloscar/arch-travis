@@ -85,7 +85,7 @@ define some environment variables in order to control the chroot setup.
 The following variables are available:
 
 `ARCH_TRAVIS_VERBOSE` by default any output generated in the chroot setup is
-suppressed and only displayed if one of the setup commands fails. By setting
+suppressed and only displayed if one of the setup commands fail. By setting
 `ARCH_TRAVIS_VERBOSE` no output is suppressed.
 
 `ARCH_TRAVIS_CHROOT` name of the folder containing the chroot. (default is
