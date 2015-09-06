@@ -63,7 +63,8 @@ section of `.travis.yml` using the following format:
 ```yml
 arch:
   repos:
-    - repo-name=http://repo.com/path
+    - repo-name=http://repo.com/path # omit the /$repo/os/$arch part of the
+                                     # mirror url
 ```
 
 The first repository in the list will be added first in `pacman.conf` and all
@@ -92,7 +93,7 @@ suppressed and only displayed if one of the setup commands fails. By setting
 `root.x86_64`).
 
 `ARCH_TRAVIS_MIRROR` Arch Linux mirror used by pacman. See list of available
-mirrors [here][arch-mirros]. (default is
+mirrors [here][arch-mirrors]. (default is
 `https://ftp.lysator.liu.se/pub/archlinux`)
 
 `ARCH_TRAVIS_ARCH_ISO` Arch iso date from which the chroot is bootstraped.
