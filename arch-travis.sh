@@ -26,6 +26,7 @@ default_root="root.x86_64"
 ARCH_TRAVIS_CHROOT=${ARCH_TRAVIS_CHROOT:-"$default_root"}
 user="travis"
 user_home="/home/$user"
+user_uid=$UID
 
 # default packages
 default_packages=("base-devel" "ruby" "git")
@@ -78,7 +79,7 @@ setup_chroot() {
   chroot_as_root "locale-gen"
 
   # setup non-root user
-  chroot_as_root "useradd -m -s /bin/bash $user"
+  chroot_as_root "useradd -u $user_uid -m -s /bin/bash $user"
 
   # disable password for sudo users
   as_root "echo \"$user ALL=(ALL) NOPASSWD: ALL\" >> $ARCH_TRAVIS_CHROOT/etc/sudoers.d/$user"
