@@ -19,7 +19,7 @@
 # Arch Linux chroot
 
 ARCH_TRAVIS_MIRROR=${ARCH_TRAVIS_MIRROR:-"https://ftp.lysator.liu.se/pub/archlinux"}
-ARCH_TRAVIS_ARCH_ISO=${ARCH_TRAVIS_ARCH_ISO:-"2015.09.01"}
+ARCH_TRAVIS_ARCH_ISO=${ARCH_TRAVIS_ARCH_ISO:-"$(date +%Y.%m).01"}
 mirror_entry='Server = '$ARCH_TRAVIS_MIRROR'/\$repo/os/\$arch'
 archive="archlinux-bootstrap-$ARCH_TRAVIS_ARCH_ISO-x86_64.tar.gz"
 default_root="root.x86_64"
