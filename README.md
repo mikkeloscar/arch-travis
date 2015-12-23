@@ -108,6 +108,21 @@ env:
   - ARCH_TRAVIS_CHROOT="custom_root"
 ```
 
+
+### clang support
+
+The default compiler available in the chroot is `gcc`, if you want to use
+`clang` instead just add the following to `.travis.yml` and arch-travis will
+export `CC=clang` in your build:
+
+
+```yml
+language: c
+
+compiler: clang
+```
+
+
 ## Contributing
 
 If you want to send a PR please do so against the `dev` branch, that way it can
