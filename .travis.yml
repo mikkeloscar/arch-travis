@@ -1,7 +1,13 @@
 sudo: required
 
-# env:
-#   - ARCH_TRAVIS_VERBOSE=1
+env:
+  - ARCH_TRAVIS_VERBOSE=1
+
+language: c
+
+compiler:
+  - gcc
+  - clang
 
 arch:
   repos:
@@ -16,6 +22,7 @@ arch:
   script:
     - "sudo archey3"
     - "reflector --verbose -l 20 --sort rate -p https"
+    - "echo $CC"
 
 script:
   - "bash ./arch-travis.sh"

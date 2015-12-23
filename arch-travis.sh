@@ -28,6 +28,12 @@ user="travis"
 user_home="/home/$user"
 user_uid=$UID
 
+# store travis CC
+TRAVIS_CC=$CC
+# reset to gcc for building arch packages
+CC=gcc
+
+
 # default packages
 default_packages=("base-devel" "ruby" "git")
 
@@ -272,11 +278,23 @@ install_packages() {
   fi
 }
 
+# install custom compiler if CC != gcc
+install_c_compiler() {
+  if [ "$TRAVIS_CC" != "gcc" ]; then
+    _pacaur "$TRAVIS_CC"
+  fi
+}
+
 setup_chroot
 
 install_packages
 
 copy_cwd
+
+install_c_compiler
+
+# restore CC
+CC=$TRAVIS_CC
 
 echo ":: Running travis build..."
 build_scripts
