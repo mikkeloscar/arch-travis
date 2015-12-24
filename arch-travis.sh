@@ -28,10 +28,13 @@ user="travis"
 user_home="/home/$user"
 user_uid=$UID
 
-# store travis CC
-TRAVIS_CC=$CC
-# reset to gcc for building arch packages
-CC=gcc
+
+if [ -n "$CC" ]; then
+  # store travis CC
+  TRAVIS_CC=$CC
+  # reset to gcc for building arch packages
+  CC=gcc
+fi
 
 
 # default packages
@@ -291,10 +294,12 @@ install_packages
 
 copy_cwd
 
-install_c_compiler
+if [ -n "$CC" ]; then
+  install_c_compiler
 
-# restore CC
-CC=$TRAVIS_CC
+  # restore CC
+  CC=$TRAVIS_CC
+fi
 
 echo ":: Running travis build..."
 build_scripts
