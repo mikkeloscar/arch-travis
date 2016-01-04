@@ -1,7 +1,7 @@
 sudo: required
 
 env:
-  - ARCH_TRAVIS_VERBOSE=1
+  - ARCH_TRAVIS_VERBOSE=1 ARCH_TRAVIS_CLEAN_CHROOT=1
 
 language: c
 
@@ -12,17 +12,16 @@ compiler:
 arch:
   repos:
     - xyne-any=http://xyne.archlinux.ca/repos/xyne
-    - papyros=http://dash.papyros.io/repos/$repo/$arch
   packages:
     - reflector
     # aur
     - archey3-git
-    # papyros
-    - papyros-shell
   script:
     - "sudo archey3"
     - "reflector --verbose -l 20 --sort rate -p https"
     - "echo $CC"
+    - "touch test_file"
 
 script:
   - "bash ./arch-travis.sh"
+  - "ls -l"

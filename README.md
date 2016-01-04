@@ -34,7 +34,8 @@ installed before running the build.
 `arch.script` defines a list of scripts to run as part of the build. Anything
 defined in the `arch.script` list will run from the base of the repository as a
 normal user called `travis`. `sudo` is available as well as any packages
-installed in the setup.
+installed in the setup. The path of the build dir (or repository base), is
+stored in the `TRAVIS_BUILD_DIR` environment variable inside the chroot.
 
 `script` defines the scripts to be run by travis, this is where arch-travis is
 initialized.
@@ -100,12 +101,15 @@ when defining this variable. (default is `https://ftp.lysator.liu.se/pub/archlin
 `ARCH_TRAVIS_ARCH_ISO` Arch iso date from which the chroot is bootstraped.
 (default is the latest iso date, updated about once a month).
 
+`ARCH_TRAVIS_CLEAN_CHROOT` by default the chroot archive and chroot folder is
+left in `$TRAVIS_BUILD_DIR`, if you don't want this, then you can make
+arch-travis remove them by enabling `ARCH_TRAVIS_CLEAN_CHROOT`.
+
 To use, just add the variable to the `env` section of `.travis.yml`.
 
 ```yml
 env:
-  - ARCH_TRAVIS_VERBOSE=1
-  - ARCH_TRAVIS_CHROOT="custom_root"
+  - ARCH_TRAVIS_VERBOSE=1 ARCH_TRAVIS_CHROOT="custom_root"
 ```
 
 
