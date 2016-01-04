@@ -130,7 +130,7 @@ be tested to make sure that it doesn't break anything in `master` which people
 might depend on.
 
 ## LICENSE
-Copyright (C) 2015  Mikkel Oscar Lyderik Larsen
+Copyright (C) 2016  Mikkel Oscar Lyderik Larsen
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
