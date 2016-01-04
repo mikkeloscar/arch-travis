@@ -26,6 +26,7 @@ default_root="root.x86_64"
 ARCH_TRAVIS_CHROOT=${ARCH_TRAVIS_CHROOT:-"$default_root"}
 user="travis"
 user_home="/home/$user"
+user_build_dir="/build"
 user_uid=$UID
 
 
@@ -61,6 +62,11 @@ setup_chroot() {
 
   # extract root fs
   as_root "tar xf $archive"
+
+  # remove archive if ARCH_TRAVIS_CLEAN_CHROOT is set
+  if [ -n "$ARCH_TRAVIS_CLEAN_CHROOT" ]; then
+    as_root "rm $archive"
+  fi
 
   if [ "$ARCH_TRAVIS_CHROOT" != "$default_root" ]; then
     as_root "mv $default_root $ARCH_TRAVIS_CHROOT"
@@ -100,8 +106,11 @@ setup_chroot() {
   # disable password for sudo users
   as_root "echo \"$user ALL=(ALL) NOPASSWD: ALL\" >> $ARCH_TRAVIS_CHROOT/etc/sudoers.d/$user"
 
-  # copy .travis.yml for access in chroot
-  copy_travis_yml
+  # Add build dir
+  chroot_as_root "mkdir $user_build_dir && chown $user $user_build_dir"
+
+  # bind $TRAVIS_BUILD_DIR to chroot build dir
+  sudo mount --bind $TRAVIS_BUILD_DIR $ARCH_TRAVIS_CHROOT$user_build_dir
 
   # add custom repos
   add_repositories
@@ -160,7 +169,7 @@ chroot_as_root() {
 
 # run command in chroot as normal user
 chroot_as_normal() {
-  local cmd="sudo chroot --userspec=$user:$user $ARCH_TRAVIS_CHROOT /bin/bash -c 'export HOME=$user_home USER=$user && cd $user_home && $1'"
+  local cmd="sudo chroot --userspec=$user:$user $ARCH_TRAVIS_CHROOT /bin/bash -c 'export HOME=$user_home USER=$user TRAVIS_BUILD_DIR=$user_build_dir && cd $user_build_dir && $1'"
   if [ -n "$ARCH_TRAVIS_VERBOSE" ]; then
     verbose $cmd
   else
@@ -195,7 +204,7 @@ output() {
 # run build script
 run_build_script() {
   echo "$ $1"
-  sudo chroot --userspec=$user:$user $ARCH_TRAVIS_CHROOT /bin/bash -c "export HOME=$user_home USER=$user && cd $user_home && $1"
+  sudo chroot --userspec=$user:$user $ARCH_TRAVIS_CHROOT /bin/bash -c "export HOME=$user_home USER=$user TRAVIS_BUILD_DIR=$user_build_dir && cd $user_build_dir && $1"
   local ret=$?
 
   if [ $ret -gt 0 ]; then
@@ -211,9 +220,8 @@ setup_pacaur() {
   # install cower
   as_normal "curl -O $aururl/$cowerarchive"
   as_normal "tar xf $cowerarchive"
-  as_root "mv cower $ARCH_TRAVIS_CHROOT$user_home"
   chroot_as_normal "cd cower && makepkg -is --skippgpcheck --noconfirm"
-  as_root "rm -r $ARCH_TRAVIS_CHROOT$user_home/cower"
+  as_root "rm -r cower"
   as_normal "rm $cowerarchive"
   # install pacaur
   chroot_as_normal "cower -dd pacaur"
@@ -231,23 +239,18 @@ _pacaur() {
 # unmounts anything mounted in the chroot setup
 takedown_chroot() {
   sudo umount $ARCH_TRAVIS_CHROOT/{run,dev/shm,dev/pts,dev,sys,proc}
+  sudo umount $ARCH_TRAVIS_CHROOT$user_build_dir
   sudo umount $ARCH_TRAVIS_CHROOT
-}
 
-# copy .travis.yml to chroot
-copy_travis_yml() {
-  cp -a .travis.yml $ARCH_TRAVIS_CHROOT$user_home
-}
-
-# copy working dir to chroot
-copy_cwd() {
-  rsync -a --exclude=$ARCH_TRAVIS_CHROOT --exclude=$archive . $ARCH_TRAVIS_CHROOT$user_home
+  if [ -n "$ARCH_TRAVIS_CLEAN_CHROOT" ]; then
+    as_root "rm -rf $ARCH_TRAVIS_CHROOT"
+  fi
 }
 
 # read value from .travis.yml
 travis_yml() {
   local cmd="ruby -ryaml -e 'puts ARGV[1..-1].inject(YAML.load(File.read(ARGV[0]))) {|acc, key| acc[key] }' .travis.yml $@"
-  sudo chroot --userspec=$user:$user $ARCH_TRAVIS_CHROOT /bin/bash -c "cd $user_home && $cmd"
+  sudo chroot --userspec=$user:$user $ARCH_TRAVIS_CHROOT /bin/bash -c "cd $user_build_dir && $cmd"
 }
 
 # check for config in .travis.yml
@@ -298,8 +301,6 @@ install_c_compiler() {
 setup_chroot
 
 install_packages
-
-copy_cwd
 
 if [ -n "$CC" ]; then
   install_c_compiler
