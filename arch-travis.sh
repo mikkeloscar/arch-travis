@@ -92,13 +92,13 @@ setup_chroot() {
   sudo mount --bind /dev/shm $ARCH_TRAVIS_CHROOT/dev/shm
   sudo mount --bind /run $ARCH_TRAVIS_CHROOT/run
 
-  # update packages
-  chroot_as_root "pacman -Syy"
-  chroot_as_root "pacman -Syu ${default_packages[*]} --noconfirm"
-
   # use LANG=en_US.UTF-8 as expected in travis environments
   sudo sed -i "s|#en_US.UTF-8|en_US.UTF-8|" $ARCH_TRAVIS_CHROOT/etc/locale.gen
   chroot_as_root "locale-gen"
+
+  # update packages
+  chroot_as_root "pacman -Syy"
+  chroot_as_root "pacman -Syu ${default_packages[*]} --noconfirm"
 
   # setup non-root user
   chroot_as_root "useradd -u $user_uid -m -s /bin/bash $user"
