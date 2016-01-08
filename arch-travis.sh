@@ -18,7 +18,7 @@
 # Script for setting up and running a travis-ci build in an up to date
 # Arch Linux chroot
 
-ARCH_TRAVIS_MIRROR=${ARCH_TRAVIS_MIRROR:-"https://ftp.lysator.liu.se/pub/archlinux"}
+ARCH_TRAVIS_MIRROR=${ARCH_TRAVIS_MIRROR:-"https://lug.mtu.edu/archlinux"}
 ARCH_TRAVIS_ARCH_ISO=${ARCH_TRAVIS_ARCH_ISO:-"$(date +%Y.%m).01"}
 mirror_entry='Server = '$ARCH_TRAVIS_MIRROR'/\$repo/os/\$arch'
 archive="archlinux-bootstrap-$ARCH_TRAVIS_ARCH_ISO-x86_64.tar.gz"
