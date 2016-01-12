@@ -73,10 +73,10 @@ setup_chroot() {
   fi
 
   # don't care for signed packages
-  sudo sed -i "s|SigLevel    = Required DatabaseOptional|SigLevel = Never|" $ARCH_TRAVIS_CHROOT/etc/pacman.conf
+  as_root "sed -i 's|SigLevel    = Required DatabaseOptional|SigLevel = Never|' $ARCH_TRAVIS_CHROOT/etc/pacman.conf"
 
   # enable multilib
-  sudo sed -i 's|#\[multilib\]|\[multilib\]\nInclude = /etc/pacman.d/mirrorlist|' $ARCH_TRAVIS_CHROOT/etc/pacman.conf
+  as_root "sed -i 's|#\[multilib\]|\[multilib\]\nInclude = /etc/pacman.d/mirrorlist|' $ARCH_TRAVIS_CHROOT/etc/pacman.conf"
 
   # add mirror
   as_root "echo $mirror_entry >> $ARCH_TRAVIS_CHROOT/etc/pacman.d/mirrorlist"
@@ -97,7 +97,7 @@ setup_chroot() {
   chroot_as_root "pacman -Syu ${default_packages[*]} --noconfirm"
 
   # use LANG=en_US.UTF-8 as expected in travis environments
-  sudo sed -i "s|#en_US.UTF-8|en_US.UTF-8|" $ARCH_TRAVIS_CHROOT/etc/locale.gen
+  as_root "sed -i 's|#en_US.UTF-8|en_US.UTF-8|' $ARCH_TRAVIS_CHROOT/etc/locale.gen"
   chroot_as_root "locale-gen"
 
   # setup non-root user
@@ -126,9 +126,9 @@ add_repositories() {
     for r in $(travis_yml arch repos); do
       local splitarr=(${r//=/ })
       ((repo_line+=1))
-      sudo sed -i "${repo_line}i[${splitarr[0]}]" $ARCH_TRAVIS_CHROOT/etc/pacman.conf
+      as_root "sed -i '${repo_line}i[${splitarr[0]}]' $ARCH_TRAVIS_CHROOT/etc/pacman.conf"
       ((repo_line+=1))
-      sudo sed -i "${repo_line}iServer = ${splitarr[1]}\n" $ARCH_TRAVIS_CHROOT/etc/pacman.conf
+      as_root "sed -i '${repo_line}iServer = ${splitarr[1]}\n' $ARCH_TRAVIS_CHROOT/etc/pacman.conf"
       ((repo_line+=1))
     done
 
@@ -137,49 +137,56 @@ add_repositories() {
   fi
 }
 
+# a wrapper which can be used to eventually add fakeroot support.
+sudo_wrapper() {
+  sudo "$@"
+}
+
 # run command as normal user
 as_normal() {
-  local cmd="/bin/bash -c '$1'"
+  local str="$@"
   if [ -n "$ARCH_TRAVIS_VERBOSE" ]; then
-    verbose $cmd
+    verbose /bin/bash -c "$str"
   else
-    output $cmd
+    output /bin/bash -c "$str"
   fi
 }
 
 # run command as root
 as_root() {
-  local cmd="sudo /bin/bash -c '$1'"
+  local str="$@"
   if [ -n "$ARCH_TRAVIS_VERBOSE" ]; then
-    verbose $cmd
+    verbose sudo_wrapper /bin/bash -c "$str"
   else
-    output $cmd
+    output sudo_wrapper /bin/bash -c "$str"
   fi
 }
 
 # run command in chroot as root
 chroot_as_root() {
-  local cmd="sudo chroot $ARCH_TRAVIS_CHROOT /bin/bash -c '$1'"
+  local str="$@"
   if [ -n "$ARCH_TRAVIS_VERBOSE" ]; then
-    verbose $cmd
+    verbose sudo_wrapper chroot $ARCH_TRAVIS_CHROOT /bin/bash -c "$str"
   else
-    output $cmd
+    output sudo_wrapper chroot $ARCH_TRAVIS_CHROOT /bin/bash -c "$str"
   fi
 }
 
 # run command in chroot as normal user
 chroot_as_normal() {
-  local cmd="sudo chroot --userspec=$user:$user $ARCH_TRAVIS_CHROOT /bin/bash -c 'export HOME=$user_home USER=$user TRAVIS_BUILD_DIR=$user_build_dir && cd $user_build_dir && $1'"
+  local str="$@"
   if [ -n "$ARCH_TRAVIS_VERBOSE" ]; then
-    verbose $cmd
+    verbose sudo_wrapper chroot --userspec=$user:$user $ARCH_TRAVIS_CHROOT /bin/bash \
+      -c "export HOME=$user_home USER=$user TRAVIS_BUILD_DIR=$user_build_dir && cd $user_build_dir && $str"
   else
-    output $cmd
+    output sudo_wrapper chroot --userspec=$user:$user $ARCH_TRAVIS_CHROOT /bin/bash \
+      -c "export HOME=$user_home USER=$user TRAVIS_BUILD_DIR=$user_build_dir && cd $user_build_dir && $str"
   fi
 }
 
 # run command in verbose mode
 verbose() {
-  eval $@
+  "$@"
   local ret=$?
 
   if [ $ret -gt 0 ]; then
@@ -191,7 +198,7 @@ verbose() {
 # run command in default mode
 # Any output is suppressed unless the command returns with an error
 output() {
-  out=$(eval $@ 2>&1)
+  out=$("$@" 2>&1)
   local ret=$?
 
   if [ $ret -gt 0 ]; then
@@ -203,8 +210,8 @@ output() {
 
 # run build script
 run_build_script() {
-  echo "$ $1"
-  sudo chroot --userspec=$user:$user $ARCH_TRAVIS_CHROOT /bin/bash -c "export HOME=$user_home USER=$user TRAVIS_BUILD_DIR=$user_build_dir && cd $user_build_dir && $1"
+  echo "$ $@"
+  sudo_wrapper chroot --userspec=$user:$user $ARCH_TRAVIS_CHROOT /bin/bash -c "export HOME=$user_home USER=$user TRAVIS_BUILD_DIR=$user_build_dir && cd $user_build_dir && $@"
   local ret=$?
 
   if [ $ret -gt 0 ]; then
@@ -250,7 +257,7 @@ takedown_chroot() {
 # read value from .travis.yml
 travis_yml() {
   local cmd="ruby -ryaml -e 'puts ARGV[1..-1].inject(YAML.load(File.read(ARGV[0]))) {|acc, key| acc[key] }' .travis.yml $@"
-  sudo chroot --userspec=$user:$user $ARCH_TRAVIS_CHROOT /bin/bash -c "cd $user_build_dir && $cmd"
+  sudo_wrapper chroot --userspec=$user:$user $ARCH_TRAVIS_CHROOT /bin/bash -c "cd $user_build_dir && $cmd"
 }
 
 # check for config in .travis.yml
