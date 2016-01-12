@@ -94,7 +94,7 @@ suppressed and only displayed if one of the setup commands fail. By setting
 
 `ARCH_TRAVIS_MIRROR` Arch Linux mirror used by pacman. See list of available
 mirrors [here][arch-mirrors]. Omit the `/$repo/os/$arch` part of the mirror
-when defining this variable. (default is `https://ftp.lysator.liu.se/pub/archlinux`)
+when defining this variable. (default is `https://lug.mtu.edu/archlinux`)
 
 > Note some https mirrors are not supported due to [#4757][travis-issue-4757].
 
