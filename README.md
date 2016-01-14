@@ -133,6 +133,10 @@ If you want to send a PR please do so against the `dev` branch, that way it can
 be tested to make sure that it doesn't break anything in `master` which people
 might depend on.
 
+## Projects using arch-travis
+
+* [sway](https://github.com/SirCmpwn/sway)
+
 ## LICENSE
 Copyright (C) 2016  Mikkel Oscar Lyderik Larsen
 
