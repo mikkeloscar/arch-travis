@@ -39,7 +39,7 @@ fi
 
 
 # default packages
-default_packages=("base-devel" "ruby" "git")
+default_packages=("base-devel" "git")
 
 # pacman.conf repository line
 repo_line=70
@@ -121,9 +121,8 @@ setup_chroot() {
 
 # add custom repositories to pacman.conf
 add_repositories() {
-  local valid=$(check_travis_yml arch repos)
-  if [ $valid -eq 0 ]; then
-    for r in $(travis_yml arch repos); do
+  if [ ${#CONFIG_REPOS[@]} -gt 0 ]; then
+    for r in "${CONFIG_REPOS[@]}"; do
       local splitarr=(${r//=/ })
       ((repo_line+=1))
       as_root "sed -i '${repo_line}i[${splitarr[0]}]' $ARCH_TRAVIS_CHROOT/etc/pacman.conf"
@@ -210,8 +209,9 @@ output() {
 
 # run build script
 run_build_script() {
-  echo "$ $@"
-  sudo_wrapper chroot --userspec=$user:$user $ARCH_TRAVIS_CHROOT /bin/bash -c "export HOME=$user_home USER=$user TRAVIS_BUILD_DIR=$user_build_dir && cd $user_build_dir && $@"
+  local cmd="$@"
+  echo "$ $cmd"
+  sudo_wrapper chroot --userspec=$user:$user $ARCH_TRAVIS_CHROOT /bin/bash -c "export HOME=$user_home USER=$user TRAVIS_BUILD_DIR=$user_build_dir && cd $user_build_dir && $cmd"
   local ret=$?
 
   if [ $ret -gt 0 ]; then
@@ -256,33 +256,24 @@ takedown_chroot() {
 
 # read value from .travis.yml
 travis_yml() {
-  local cmd="ruby -ryaml -e 'puts ARGV[1..-1].inject(YAML.load(File.read(ARGV[0]))) {|acc, key| acc[key] }' .travis.yml $@"
-  sudo_wrapper chroot --userspec=$user:$user $ARCH_TRAVIS_CHROOT /bin/bash -c "cd $user_build_dir && $cmd"
+  ruby -ryaml -e 'puts ARGV[1..-1].inject(YAML.load(File.read(ARGV[0]))) {|acc, key| acc[key] }' .travis.yml $@
 }
 
-# check for config in .travis.yml
-check_travis_yml() {
-  out=$(travis_yml "$@" 2>&1)
-  local ret=$?
-  if [ $ret -gt 0 ]; then
-    echo $ret
-  elif [ -z "$out" ]; then
-    echo 2
-  else
-    echo 0
-  fi
+read_config() {
+    old_ifs=$IFS
+    IFS=$'\n'
+    CONFIG_BUILD_SCRIPTS=($(travis_yml arch script))
+    CONFIG_PACKAGES=($(travis_yml arch packages))
+    CONFIG_REPOS=($(travis_yml arch repos))
+    IFS=$old_ifs
 }
 
 # run build scripts defined in .travis.yml
 build_scripts() {
-  local valid=$(check_travis_yml arch script)
-  if [ $valid -eq 0 ]; then
-    old_ifs=$IFS
-    IFS=$'\n'
-    for script in $(travis_yml "arch script"); do
+  if [ ${#CONFIG_BUILD_SCRIPTS[@]} -gt 0 ]; then
+    for script in "${CONFIG_BUILD_SCRIPTS[@]}"; do
       run_build_script $script
     done
-    IFS=$old_ifs
   else
     echo "No build scripts defined"
     takedown_chroot
@@ -292,10 +283,9 @@ build_scripts() {
 
 # install packages defined in .travis.yml
 install_packages() {
-  local valid=$(check_travis_yml arch packages)
-  if [ $valid -eq 0 ]; then
-    _pacaur $(travis_yml arch packages)
-  fi
+  for package in "${CONFIG_PACKAGES[@]}"; do
+    _pacaur $package
+  done
 }
 
 # install custom compiler if CC != gcc
@@ -304,6 +294,9 @@ install_c_compiler() {
     _pacaur "$TRAVIS_CC"
   fi
 }
+
+# read .travis.yml
+read_config
 
 setup_chroot
 
