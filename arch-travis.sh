@@ -29,7 +29,6 @@ user_home="/home/$user"
 user_build_dir="/build"
 user_uid=$UID
 
-
 if [ -n "$CC" ]; then
   # store travis CC
   TRAVIS_CC=$CC
@@ -46,7 +45,7 @@ repo_line=70
 
 # setup working Arch Linux chroot
 setup_chroot() {
-  echo ":: Setting up Arch chroot..."
+  arch_msg "Setting up Arch chroot"
 
   if [ ! -f $archive ]; then
     # get root fs
@@ -144,65 +143,35 @@ sudo_wrapper() {
 # run command as normal user
 as_normal() {
   local str="$@"
-  if [ -n "$ARCH_TRAVIS_VERBOSE" ]; then
-    verbose /bin/bash -c "$str"
-  else
-    output /bin/bash -c "$str"
-  fi
+  run /bin/bash -c "$str"
 }
 
 # run command as root
 as_root() {
   local str="$@"
-  if [ -n "$ARCH_TRAVIS_VERBOSE" ]; then
-    verbose sudo_wrapper /bin/bash -c "$str"
-  else
-    output sudo_wrapper /bin/bash -c "$str"
-  fi
+  run sudo_wrapper /bin/bash -c "$str"
 }
 
 # run command in chroot as root
 chroot_as_root() {
   local str="$@"
-  if [ -n "$ARCH_TRAVIS_VERBOSE" ]; then
-    verbose sudo_wrapper chroot $ARCH_TRAVIS_CHROOT /bin/bash -c "$str"
-  else
-    output sudo_wrapper chroot $ARCH_TRAVIS_CHROOT /bin/bash -c "$str"
-  fi
+  run sudo_wrapper chroot $ARCH_TRAVIS_CHROOT /bin/bash -c "$str"
 }
 
 # run command in chroot as normal user
 chroot_as_normal() {
   local str="$@"
-  if [ -n "$ARCH_TRAVIS_VERBOSE" ]; then
-    verbose sudo_wrapper chroot --userspec=$user:$user $ARCH_TRAVIS_CHROOT /bin/bash \
+  run sudo_wrapper chroot --userspec=$user:$user $ARCH_TRAVIS_CHROOT /bin/bash \
       -c "export HOME=$user_home USER=$user TRAVIS_BUILD_DIR=$user_build_dir && cd $user_build_dir && $str"
-  else
-    output sudo_wrapper chroot --userspec=$user:$user $ARCH_TRAVIS_CHROOT /bin/bash \
-      -c "export HOME=$user_home USER=$user TRAVIS_BUILD_DIR=$user_build_dir && cd $user_build_dir && $str"
-  fi
 }
 
-# run command in verbose mode
-verbose() {
+# run command
+run() {
   "$@"
   local ret=$?
 
   if [ $ret -gt 0 ]; then
     takedown_chroot
-    exit $ret
-  fi
-}
-
-# run command in default mode
-# Any output is suppressed unless the command returns with an error
-output() {
-  out=$("$@" 2>&1)
-  local ret=$?
-
-  if [ $ret -gt 0 ]; then
-    takedown_chroot
-    echo "${out}"
     exit $ret
   fi
 }
@@ -295,9 +264,16 @@ install_c_compiler() {
   fi
 }
 
+arch_msg() {
+  lightblue='\033[1;34m'
+  reset='\e[0m'
+  echo -e "${lightblue}$@${reset}"
+}
+
 # read .travis.yml
 read_config
 
+echo "travis_fold:start:arch_travis"
 setup_chroot
 
 install_packages
@@ -308,8 +284,10 @@ if [ -n "$CC" ]; then
   # restore CC
   CC=$TRAVIS_CC
 fi
+echo "travis_fold:end:arch_travis"
+echo ""
 
-echo ":: Running travis build..."
+arch_msg "Running travis build"
 build_scripts
 
 takedown_chroot
