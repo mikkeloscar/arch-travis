@@ -11,7 +11,7 @@ compiler:
 
 arch:
   repos:
-    - xyne-any=http://xyne.archlinux.ca/repos/xyne
+    - archlinuxfr=http://repo.archlinux.fr/$arch
   packages:
     - reflector
     # aur
