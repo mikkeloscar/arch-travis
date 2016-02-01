@@ -49,7 +49,7 @@ setup_chroot() {
 
   if [ ! -f $archive ]; then
     # get root fs
-    local curl=$(curl -O "$ARCH_TRAVIS_MIRROR/iso/$ARCH_TRAVIS_ARCH_ISO/$archive" 2>&1)
+    local curl=$(curl --fail -O "$ARCH_TRAVIS_MIRROR/iso/$ARCH_TRAVIS_ARCH_ISO/$archive" 2>&1)
 
     # if it fails, try arch iso form the previous month
     if [ $? -gt 0 ]; then
