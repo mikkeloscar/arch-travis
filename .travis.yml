@@ -13,6 +13,7 @@ arch:
   repos:
     - archlinuxfr=http://repo.archlinux.fr/$arch
   packages:
+    - procps-ng
     - reflector
     # aur
     - screenfetch-git
