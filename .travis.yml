@@ -10,6 +10,9 @@ compiler:
   - gcc
   - clang
 
+services:
+  - docker
+
 arch:
   repos:
     - archlinuxfr=http://repo.archlinux.fr/$arch
@@ -25,5 +28,5 @@ arch:
     - "touch test_file"
 
 script:
-  - "bash ./arch-travis.sh"
+  - "bash ./arch-travis-docker.sh"
   - "ls -l"
