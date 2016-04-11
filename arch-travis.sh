@@ -159,11 +159,17 @@ chroot_as_root() {
   run sudo_wrapper chroot $ARCH_TRAVIS_CHROOT /bin/bash -c "$str"
 }
 
+# execute command in chroot as normal user
+_chroot_as_normal() {
+  local str="$@"
+  sudo_wrapper chroot --userspec=$user:$user $ARCH_TRAVIS_CHROOT /bin/bash \
+    -c "export HOME=$user_home USER=$user TRAVIS_BUILD_DIR=$user_build_dir && cd $user_build_dir && $str"
+}
+
 # run command in chroot as normal user
 chroot_as_normal() {
   local str="$@"
-  run sudo_wrapper chroot --userspec=$user:$user $ARCH_TRAVIS_CHROOT /bin/bash \
-      -c "export HOME=$user_home USER=$user TRAVIS_BUILD_DIR=$user_build_dir && cd $user_build_dir && $str"
+  run _chroot_as_normal "$str"
 }
 
 # run command
@@ -181,7 +187,7 @@ run() {
 run_build_script() {
   local cmd="$@"
   echo "$ $cmd"
-  sudo_wrapper chroot --userspec=$user:$user $ARCH_TRAVIS_CHROOT /bin/bash -c "export HOME=$user_home USER=$user TRAVIS_BUILD_DIR=$user_build_dir && cd $user_build_dir && $cmd"
+  _chroot_as_normal "$cmd"
   local ret=$?
 
   if [ $ret -gt 0 ]; then
@@ -192,18 +198,23 @@ run_build_script() {
 
 # setup pacaur
 setup_pacaur() {
-  local cowerarchive="cower.tar.gz"
-  local aururl="https://aur.archlinux.org/cgit/aur.git/snapshot/"
-  # install cower
-  as_normal "curl -O $aururl/$cowerarchive"
-  as_normal "tar xf $cowerarchive"
-  chroot_as_normal "cd cower && makepkg -is --skippgpcheck --noconfirm"
-  as_root "rm -r cower"
-  as_normal "rm $cowerarchive"
-  # install pacaur
-  chroot_as_normal "cower -dd pacaur"
-  chroot_as_normal "cd pacaur && makepkg -is --noconfirm"
-  chroot_as_normal "rm -rf pacaur"
+  # Check if pacaur is available in the added repos
+  if _chroot_as_normal "pacman -Si pacaur &> /dev/null"; then
+    chroot_as_root "pacman -S --noconfirm pacaur"
+  else
+    local cowerarchive="cower.tar.gz"
+    local aururl="https://aur.archlinux.org/cgit/aur.git/snapshot/"
+    # install cower
+    as_normal "curl -O $aururl/$cowerarchive"
+    as_normal "tar xf $cowerarchive"
+    chroot_as_normal "cd cower && makepkg -is --skippgpcheck --noconfirm"
+    as_root "rm -r cower"
+    as_normal "rm $cowerarchive"
+    # install pacaur
+    chroot_as_normal "cower -dd pacaur"
+    chroot_as_normal "cd pacaur && makepkg -is --noconfirm"
+    chroot_as_normal "rm -rf pacaur"
+  fi
 }
 
 # install package through pacaur
