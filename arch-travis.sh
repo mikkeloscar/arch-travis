@@ -198,18 +198,23 @@ run_build_script() {
 
 # setup pacaur
 setup_pacaur() {
-  local cowerarchive="cower.tar.gz"
-  local aururl="https://aur.archlinux.org/cgit/aur.git/snapshot/"
-  # install cower
-  as_normal "curl -O $aururl/$cowerarchive"
-  as_normal "tar xf $cowerarchive"
-  chroot_as_normal "cd cower && makepkg -is --skippgpcheck --noconfirm"
-  as_root "rm -r cower"
-  as_normal "rm $cowerarchive"
-  # install pacaur
-  chroot_as_normal "cower -dd pacaur"
-  chroot_as_normal "cd pacaur && makepkg -is --noconfirm"
-  chroot_as_normal "rm -rf pacaur"
+  # Check if pacaur is available in the added repos
+  if _chroot_as_normal "pacman -Si pacaur &> /dev/null"; then
+    chroot_as_root "pacman -S --noconfirm pacaur"
+  else
+    local cowerarchive="cower.tar.gz"
+    local aururl="https://aur.archlinux.org/cgit/aur.git/snapshot/"
+    # install cower
+    as_normal "curl -O $aururl/$cowerarchive"
+    as_normal "tar xf $cowerarchive"
+    chroot_as_normal "cd cower && makepkg -is --skippgpcheck --noconfirm"
+    as_root "rm -r cower"
+    as_normal "rm $cowerarchive"
+    # install pacaur
+    chroot_as_normal "cower -dd pacaur"
+    chroot_as_normal "cd pacaur && makepkg -is --noconfirm"
+    chroot_as_normal "rm -rf pacaur"
+  fi
 }
 
 # install package through pacaur
