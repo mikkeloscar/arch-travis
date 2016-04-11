@@ -26,7 +26,7 @@ default_root="root.x86_64"
 ARCH_TRAVIS_CHROOT=${ARCH_TRAVIS_CHROOT:-"$default_root"}
 user="travis"
 user_home="/home/$user"
-user_build_dir="/build"
+user_build_dir=$(pwd)
 user_uid=$UID
 
 if [ -n "$CC" ]; then
@@ -107,7 +107,7 @@ setup_chroot() {
   as_root "echo \"$user ALL=(ALL) NOPASSWD: ALL\" >> $ARCH_TRAVIS_CHROOT/etc/sudoers.d/$user"
 
   # Add build dir
-  chroot_as_root "mkdir $user_build_dir && chown $user $user_build_dir"
+  chroot_as_root "mkdir -p $user_build_dir && chown $user $user_build_dir"
 
   # bind $TRAVIS_BUILD_DIR to chroot build dir
   sudo mount --bind $TRAVIS_BUILD_DIR $ARCH_TRAVIS_CHROOT$user_build_dir
