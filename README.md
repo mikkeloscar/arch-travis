@@ -101,6 +101,9 @@ when defining this variable. (default is `https://lug.mtu.edu/archlinux`)
 left in `$TRAVIS_BUILD_DIR`, if you don't want this, then you can make
 arch-travis remove them by enabling `ARCH_TRAVIS_CLEAN_CHROOT`.
 
+`ARCH_TRAVIS_ARCH` Set the default architecture to use in the chroot. Valid
+values are `x86_64` (default) and `i686`.
+
 To use, just add the variable to the `env` section of `.travis.yml`.
 
 ```yml
