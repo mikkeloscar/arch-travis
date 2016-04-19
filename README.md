@@ -46,7 +46,6 @@ By default the following packages are installed and usable from within the
 build environment.
 
 * base-devel (group)
-* [ruby](https://www.archlinux.org/packages/extra/x86_64/ruby/)
 * [git](https://www.archlinux.org/packages/extra/x86_64/git/)
 * [cower](https://aur.archlinux.org/packages/cower/)
 * [pacaur](https://aur.archlinux.org/packages/pacaur/)
