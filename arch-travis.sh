@@ -38,6 +38,8 @@ if [ -n "$CC" ]; then
   CC=gcc
 fi
 
+GOROOT=""
+
 
 # default packages
 default_packages=("base-devel" "git")
