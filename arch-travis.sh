@@ -63,7 +63,7 @@ setup_chroot() {
   fi
 
   # extract root fs
-  as_root "tar xf $archive"
+  as_root "tar xf $archive -C $HOME"
 
   # remove archive if ARCH_TRAVIS_CLEAN_CHROOT is set
   if [ -n "$ARCH_TRAVIS_CLEAN_CHROOT" ]; then
@@ -71,8 +71,10 @@ setup_chroot() {
   fi
 
   if [ "$ARCH_TRAVIS_CHROOT" != "$default_root" ]; then
-    as_root "mv $default_root $ARCH_TRAVIS_CHROOT"
+    as_root "mv $HOME/$default_root $HOME/$ARCH_TRAVIS_CHROOT"
   fi
+
+  ARCH_TRAVIS_CHROOT="$HOME/$ARCH_TRAVIS_CHROOT"
 
   # don't care for signed packages
   as_root "sed -i 's|SigLevel    = Required DatabaseOptional|SigLevel = Never|' $ARCH_TRAVIS_CHROOT/etc/pacman.conf"
@@ -108,11 +110,14 @@ setup_chroot() {
   # disable password for sudo users
   as_root "echo \"$user ALL=(ALL) NOPASSWD: ALL\" >> $ARCH_TRAVIS_CHROOT/etc/sudoers.d/$user"
 
-  # Add build dir
-  chroot_as_root "mkdir -p $user_build_dir && chown $user $user_build_dir"
-
-  # bind $TRAVIS_BUILD_DIR to chroot build dir
-  sudo mount --bind $TRAVIS_BUILD_DIR $ARCH_TRAVIS_CHROOT$user_build_dir
+  # mount HOME dirs
+  for d in $HOME/*/; do
+    if [ "$d" != "$ARCH_TRAVIS_CHROOT/" ]; then
+      dir="$user_home/$(basename "$d")"
+      chroot_as_root "mkdir -p $dir && chown $user $dir"
+      sudo mount --bind "$d" "$ARCH_TRAVIS_CHROOT$dir"
+    fi
+  done
 
   # add custom repos
   add_repositories
@@ -231,7 +236,12 @@ _pacaur() {
 # unmounts anything mounted in the chroot setup
 takedown_chroot() {
   sudo umount $ARCH_TRAVIS_CHROOT/{run,dev/shm,dev/pts,dev,sys,proc}
-  sudo umount $ARCH_TRAVIS_CHROOT$user_build_dir
+  # umount HOME dirs
+  for d in $HOME/*/; do
+    if [ "$d" != "$ARCH_TRAVIS_CHROOT/" ]; then
+      sudo umount "$ARCH_TRAVIS_CHROOT$user_home/$(basename "$d")"
+    fi
+  done
   sudo umount $ARCH_TRAVIS_CHROOT
 
   if [ -n "$ARCH_TRAVIS_CLEAN_CHROOT" ]; then
