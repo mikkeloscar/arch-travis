@@ -145,35 +145,35 @@ sudo_wrapper() {
 
 # run command as normal user
 as_normal() {
-  local str="$@"
-  run /bin/bash -c "$str"
+  local cmd="$@"
+  run /bin/bash -c "$cmd"
 }
 
 # run command as root
 as_root() {
-  local str="$@"
-  run sudo_wrapper /bin/bash -c "$str"
+  local cmd="$@"
+  run sudo_wrapper /bin/bash -c "$cmd"
 }
 
 # run command in chroot as root
 chroot_as_root() {
-  local str="$@"
+  local cmd="$@"
   run sudo_wrapper setarch $ARCH_TRAVIS_ARCH chroot \
-    $ARCH_TRAVIS_CHROOT /bin/bash -c "$str"
+    $ARCH_TRAVIS_CHROOT /bin/bash -c "$cmd"
 }
 
 # execute command in chroot as normal user
 _chroot_as_normal() {
-  local str="$@"
+  local cmd="$@"
   sudo_wrapper setarch $ARCH_TRAVIS_ARCH chroot \
     --userspec=$uid:$uid $ARCH_TRAVIS_CHROOT /bin/bash \
-    -c "export HOME=$user_home USER=$user TRAVIS_BUILD_DIR=$user_build_dir && cd $user_build_dir && $str"
+    -c "cd $user_build_dir && $cmd"
 }
 
 # run command in chroot as normal user
 chroot_as_normal() {
-  local str="$@"
-  run _chroot_as_normal "$str"
+  local cmd="$@"
+  run _chroot_as_normal "$cmd"
 }
 
 # run command
