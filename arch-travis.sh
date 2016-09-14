@@ -19,10 +19,9 @@
 # Arch Linux chroot
 
 ARCH_TRAVIS_MIRROR=${ARCH_TRAVIS_MIRROR:-"https://arch.localmsp.org/arch"}
-ARCH_TRAVIS_ARCH_ISO=${ARCH_TRAVIS_ARCH_ISO:-"$(date +%Y.%m).01"}
 ARCH_TRAVIS_ARCH=${ARCH_TRAVIS_ARCH:-"x86_64"}
 mirror_entry='Server = '$ARCH_TRAVIS_MIRROR'/\$repo/os/\$arch'
-archive="archlinux-bootstrap-$ARCH_TRAVIS_ARCH_ISO-${ARCH_TRAVIS_ARCH}.tar.gz"
+ARCH_TRAVIS_ROOT_ARCHIVE=""
 default_root="root.${ARCH_TRAVIS_ARCH}"
 ARCH_TRAVIS_CHROOT=${ARCH_TRAVIS_CHROOT:-"$default_root"}
 user="travis"
@@ -47,29 +46,67 @@ default_packages=("base-devel" "git")
 # pacman.conf repository line
 repo_line=70
 
+# try to find the latest iso by iterating through the dates of the current
+# month, falling back to the last month if needed.
+get_base_archive() {
+  local months=(
+    $(date +%Y.%m)
+    $(date +%Y.%m -d "-1 month")
+  )
+
+  for date in "${months[@]}"; do
+      echo $date
+    for i in {1..15}; do
+      local iso_date="$date"
+      if [ "$i" -lt 10 ]; then
+        iso_date="$date.0$i"
+      else
+        iso_date="$date.$i"
+      fi
+
+      ARCH_TRAVIS_ROOT_ARCHIVE="archlinux-bootstrap-${iso_date}-${ARCH_TRAVIS_ARCH}.tar.gz"
+      local url="$ARCH_TRAVIS_MIRROR/iso/$iso_date/$ARCH_TRAVIS_ROOT_ARCHIVE"
+
+      if [ -f "$ARCH_TRAVIS_ROOT_ARCHIVE" ]; then
+          return
+      fi
+
+      echo $url
+      curl --fail -O $url 2>&1
+      local ret=$?
+
+      if [ $ret -eq 0 ]; then
+        return
+      fi
+    done
+  done
+}
+
 # setup working Arch Linux chroot
 setup_chroot() {
   arch_msg "Setting up Arch chroot"
 
-  if [ ! -f $archive ]; then
-    # get root fs
-    curl --fail -O "$ARCH_TRAVIS_MIRROR/iso/$ARCH_TRAVIS_ARCH_ISO/$archive" 2>&1
-    local ret=$?
+  # if [ ! -f $archive ]; then
+  #   # get root fs
+  #   curl --fail -O "$ARCH_TRAVIS_MIRROR/iso/$ARCH_TRAVIS_ARCH_ISO/$archive" 2>&1
+  #   local ret=$?
 
-    # if it fails, try arch iso form the previous month
-    if [ $ret -gt 0 ]; then
-      ARCH_TRAVIS_ARCH_ISO="$(date +%Y.%m -d "-1 month").01"
-      archive="archlinux-bootstrap-$ARCH_TRAVIS_ARCH_ISO-${ARCH_TRAVIS_ARCH}.tar.gz"
-      as_normal "curl -O $ARCH_TRAVIS_MIRROR/iso/$ARCH_TRAVIS_ARCH_ISO/$archive"
-    fi
-  fi
+  #   # if it fails, try arch iso form the previous month
+  #   if [ $ret -gt 0 ]; then
+  #     ARCH_TRAVIS_ARCH_ISO="$(date +%Y.%m -d "-1 month").01"
+  #     archive="archlinux-bootstrap-$ARCH_TRAVIS_ARCH_ISO-${ARCH_TRAVIS_ARCH}.tar.gz"
+  #     as_normal "curl -O $ARCH_TRAVIS_MIRROR/iso/$ARCH_TRAVIS_ARCH_ISO/$archive"
+  #   fi
+  # fi
+
+  get_base_archive
 
   # extract root fs
-  as_root "tar xf $archive -C $HOME"
+  as_root "tar xf $ARCH_TRAVIS_ROOT_ARCHIVE -C $HOME"
 
   # remove archive if ARCH_TRAVIS_CLEAN_CHROOT is set
   if [ -n "$ARCH_TRAVIS_CLEAN_CHROOT" ]; then
-    as_root "rm $archive"
+    as_root "rm $ARCH_TRAVIS_ROOT_ARCHIVE"
   fi
 
   if [ "$ARCH_TRAVIS_CHROOT" != "$default_root" ]; then
