@@ -89,12 +89,9 @@ The following variables are available:
 
 `ARCH_TRAVIS_MIRROR` Arch Linux mirror used by pacman. See list of available
 mirrors [here][arch-mirrors]. Omit the `/$repo/os/$arch` part of the mirror
-when defining this variable. (default is `https://lug.mtu.edu/archlinux`)
+when defining this variable. (default is `https://arch.localmsp.org/arch`)
 
 > Note some https mirrors are not supported due to [#4757][travis-issue-4757].
-
-`ARCH_TRAVIS_ARCH_ISO` Arch iso date from which the chroot is bootstraped.
-(default is the latest iso date, updated about once a month).
 
 `ARCH_TRAVIS_CLEAN_CHROOT` by default the chroot archive and chroot folder is
 left in `$TRAVIS_BUILD_DIR`, if you don't want this, then you can make
