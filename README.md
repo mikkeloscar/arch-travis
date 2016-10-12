@@ -89,7 +89,7 @@ The following variables are available:
 
 `ARCH_TRAVIS_MIRROR` Arch Linux mirror used by pacman. See list of available
 mirrors [here][arch-mirrors]. Omit the `/$repo/os/$arch` part of the mirror
-when defining this variable. (default is `https://arch.localmsp.org/arch`)
+when defining this variable. (default is `https://mirrors.lug.mtu.edu/archlinux`)
 
 > Note some https mirrors are not supported due to [#4757][travis-issue-4757].
 
