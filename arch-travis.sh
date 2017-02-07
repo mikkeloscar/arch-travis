@@ -39,6 +39,10 @@ fi
 
 GOROOT=""
 
+# set EDITOR to make pacaur happy:
+# https://github.com/rmarquis/pacaur/issues/637
+export EDITOR=false
+
 
 # default packages
 default_packages=("base-devel" "git")
