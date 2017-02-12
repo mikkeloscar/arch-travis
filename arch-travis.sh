@@ -215,7 +215,7 @@ _chroot_as_normal() {
   local cmd="$@"
   sudo_wrapper setarch $ARCH_TRAVIS_ARCH chroot \
     --userspec=$uid:$uid $ARCH_TRAVIS_CHROOT /bin/bash \
-    -c "cd $user_build_dir && $cmd"
+    -c "export PATH=$PATH && cd $user_build_dir && $cmd"
 }
 
 # run command in chroot as normal user
