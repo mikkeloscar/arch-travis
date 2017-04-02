@@ -141,11 +141,7 @@ setup_chroot() {
 
   # update packages
   chroot_as_root "pacman -Syy"
-  # fix for https://www.archlinux.org/news/ca-certificates-utils-20170307-1-upgrade-requires-manual-intervention/
-  chroot_as_root "pacman -Syu ${default_packages[*]} --noconfirm --ignore ca-certificates-utils"
-  chroot_as_root "pacman -Syuw ${default_packages[*]} --noconfirm"
-  chroot_as_root "rm /etc/ssl/certs/ca-certificates.crt"
-  chroot_as_root "pacman -Su --noconfirm"
+  chroot_as_root "pacman -Syu ${default_packages[*]} --noconfirm"
 
   # use LANG=en_US.UTF-8 as expected in travis environments
   as_root "sed -i 's|#en_US.UTF-8|en_US.UTF-8|' $ARCH_TRAVIS_CHROOT/etc/locale.gen"
