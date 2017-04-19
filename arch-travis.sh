@@ -18,9 +18,10 @@
 # Script for setting up and running a travis-ci build in an up to date
 # Arch Linux chroot
 
-ARCH_TRAVIS_MIRROR=${ARCH_TRAVIS_MIRROR:-"https://mirrors.ocf.berkeley.edu/archlinux"}
+ARCH_TRAVIS_MIRRORS=${ARCH_TRAVIS_MIRRORS:-"https://mirrors.ocf.berkeley.edu/archlinux,https://mirror.csclub.uwaterloo.ca/archlinux,https://mirror.lty.me/archlinux"}
+mirrors=(${ARCH_TRAVIS_MIRRORS//,/ })
 ARCH_TRAVIS_ARCH=${ARCH_TRAVIS_ARCH:-"x86_64"}
-mirror_entry='Server = '$ARCH_TRAVIS_MIRROR'/\$repo/os/\$arch'
+mirror_entry_fmt='Server = %s/\$repo/os/\$arch'
 ARCH_TRAVIS_ROOT_ARCHIVE=""
 default_root="root.${ARCH_TRAVIS_ARCH}"
 ARCH_TRAVIS_CHROOT=${ARCH_TRAVIS_CHROOT:-"$default_root"}
@@ -58,30 +59,32 @@ get_base_archive() {
     $(date +%Y.%m -d "-1 month")
   )
 
-  for date in "${months[@]}"; do
-      echo $date
-    for i in {1..15}; do
-      local iso_date="$date"
-      if [ "$i" -lt 10 ]; then
-        iso_date="$date.0$i"
-      else
-        iso_date="$date.$i"
-      fi
+  for mirror in "${mirrors[@]}"; do
+    for date in "${months[@]}"; do
+        echo $date
+      for i in {1..15}; do
+        local iso_date="$date"
+        if [ "$i" -lt 10 ]; then
+          iso_date="$date.0$i"
+        else
+          iso_date="$date.$i"
+        fi
 
-      ARCH_TRAVIS_ROOT_ARCHIVE="archlinux-bootstrap-${iso_date}-${ARCH_TRAVIS_ARCH}.tar.gz"
-      local url="$ARCH_TRAVIS_MIRROR/iso/$iso_date/$ARCH_TRAVIS_ROOT_ARCHIVE"
+        ARCH_TRAVIS_ROOT_ARCHIVE="archlinux-bootstrap-${iso_date}-${ARCH_TRAVIS_ARCH}.tar.gz"
+        local url="$mirror/iso/$iso_date/$ARCH_TRAVIS_ROOT_ARCHIVE"
 
-      if [ -f "$ARCH_TRAVIS_ROOT_ARCHIVE" ]; then
+        if [ -f "$ARCH_TRAVIS_ROOT_ARCHIVE" ]; then
+            return
+        fi
+
+        echo $url
+        curl --fail -O $url 2>&1
+        local ret=$?
+
+        if [ $ret -eq 0 ]; then
           return
-      fi
-
-      echo $url
-      curl --fail -O $url 2>&1
-      local ret=$?
-
-      if [ $ret -eq 0 ]; then
-        return
-      fi
+        fi
+      done
     done
   done
 }
@@ -125,8 +128,11 @@ setup_chroot() {
   # enable multilib
   as_root "sed -i 's|#\[multilib\]|\[multilib\]\nInclude = /etc/pacman.d/mirrorlist|' $ARCH_TRAVIS_CHROOT/etc/pacman.conf"
 
-  # add mirror
-  as_root "echo $mirror_entry >> $ARCH_TRAVIS_CHROOT/etc/pacman.d/mirrorlist"
+  # add mirrors
+  for mirror in "${mirrors[@]}"; do
+    mirror_entry="$(printf "$mirror_entry_fmt" $mirror)"
+    as_root "echo $mirror_entry >> $ARCH_TRAVIS_CHROOT/etc/pacman.d/mirrorlist"
+  done
 
   # add nameserver to resolv.conf
   as_root "echo nameserver 8.8.8.8 >> $ARCH_TRAVIS_CHROOT/etc/resolv.conf"
