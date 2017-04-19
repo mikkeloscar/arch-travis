@@ -87,9 +87,9 @@ The following variables are available:
 `ARCH_TRAVIS_CHROOT` name of the folder containing the chroot. (default is
 `root.x86_64`).
 
-`ARCH_TRAVIS_MIRROR` Arch Linux mirror used by pacman. See list of available
-mirrors [here][arch-mirrors]. Omit the `/$repo/os/$arch` part of the mirror
-when defining this variable. (default is `https://mirrors.lug.mtu.edu/archlinux`)
+`ARCH_TRAVIS_MIRRORS` Comma separated list of Arch Linux mirrors used by
+pacman. See list of available mirrors [here][arch-mirrors]. Omit the
+`/$repo/os/$arch` part of the mirrors when defining this variable.
 
 > Note some https mirrors are not supported due to [#4757][travis-issue-4757].
 
