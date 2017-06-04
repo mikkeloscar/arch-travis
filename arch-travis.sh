@@ -278,6 +278,13 @@ setup_pacaur() {
 # install package through pacaur
 _pacaur() {
   local pacaur="pacaur -S $@ --noconfirm --noedit"
+  echo "$ARCH_TRAVIS_CONFIRM_YES"
+  if [ -n "$ARCH_TRAVIS_CONFIRM_YES" ]; then
+    pacaur="yes | $pacaur"
+  fi
+
+  echo "$pacaur"
+
   chroot_as_normal "$pacaur"
 }
 

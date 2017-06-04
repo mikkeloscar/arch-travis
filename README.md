@@ -100,6 +100,11 @@ arch-travis remove them by enabling `ARCH_TRAVIS_CLEAN_CHROOT`.
 `ARCH_TRAVIS_ARCH` Set the default architecture to use in the chroot. Valid
 values are `x86_64` (default) and `i686`.
 
+`ARCH_TRAVIS_CONFIRM_YES` when set, this configures `arch-travis` to always
+answer yes when installing packages. This is needed if you want to overwrite a
+default package e.g. `pacman-git` where pacaur will prompt `pacman-git and
+pacman are in conflict. Remove pacman? [y/N]`.
+
 To use, just add the variable to the `env` section of `.travis.yml`.
 
 ```yml
