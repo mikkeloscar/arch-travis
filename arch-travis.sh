@@ -277,7 +277,8 @@ setup_pacaur() {
 
 # install package through pacaur
 _pacaur() {
-  local pacaur="pacaur -S $@ --noconfirm --noedit"
+  local IFS=" ";
+  local pacaur="pacaur -S $* --noconfirm --noedit --needed"
   echo "$ARCH_TRAVIS_CONFIRM_YES"
   if [ -n "$ARCH_TRAVIS_CONFIRM_YES" ]; then
     pacaur="yes | $pacaur"
@@ -334,9 +335,7 @@ build_scripts() {
 
 # install packages defined in .travis.yml
 install_packages() {
-  for package in "${CONFIG_PACKAGES[@]}"; do
-    _pacaur $package
-  done
+  _pacaur "${CONFIG_PACKAGES[@]}"
 }
 
 # install custom compiler if CC != gcc
