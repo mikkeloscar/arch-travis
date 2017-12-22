@@ -128,6 +128,9 @@ setup_chroot() {
   # enable multilib
   as_root "sed -i 's|#\[multilib\]|\[multilib\]\nInclude = /etc/pacman.d/mirrorlist|' $ARCH_TRAVIS_CHROOT/etc/pacman.conf"
 
+  # pin systemd
+  as_root "sed -i 's|#IgnorePkg   =|IgnorePkg   = systemd libsystemd|' $ARCH_TRAVIS_CHROOT/etc/pacman.conf"
+
   # add mirrors
   for mirror in "${mirrors[@]}"; do
     mirror_entry="$(printf "$mirror_entry_fmt" $mirror)"
