@@ -55,7 +55,7 @@ repo_line=70
 # month, falling back to the last month if needed.
 get_base_archive() {
   local months=(
-    $(date +%Y.%m)
+    # $(date +%Y.%m)
     $(date +%Y.%m -d "-1 month")
   )
 
