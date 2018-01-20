@@ -129,6 +129,7 @@ compiler: clang
 ## Projects using arch-travis
 
 * [sway](https://github.com/SirCmpwn/sway)
+* [networkd-dispatcher](https://github.com/craftyguy/networkd-dispatcher)
 
 ## LICENSE
 Copyright (C) 2016-2017  Mikkel Oscar Lyderik Larsen
