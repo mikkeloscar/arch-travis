@@ -57,7 +57,7 @@ get_base_archive() {
   local months=(
     # $(date +%Y.%m)
     # $(date +%Y.%m -d "-1 month")
-    '2017.12' # hardcoded to known good month
+    '2018.03' # hardcoded to known good month
   )
 
   for mirror in "${mirrors[@]}"; do
