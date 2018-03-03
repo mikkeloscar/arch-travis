@@ -1,29 +1,28 @@
 sudo: required
 
-env:
-  - ARCH_TRAVIS_CLEAN_CHROOT=1
-  - ARCH_TRAVIS_CONFIRM_YES=1
-
 language: c
 
 compiler:
-  - gcc
-  - clang
+- gcc
+- clang
+
+services:
+- docker
 
 arch:
   repos:
-    - archlinuxfr=http://repo.archlinux.fr/$arch
+  - archlinuxfr=http://repo.archlinux.fr/$arch
   packages:
-    - procps-ng
-    - reflector
-    # aur
-    - screenfetch-git
+  - procps-ng
+  - reflector
+  # aur
+  - screenfetch-git
   script:
-    - "sudo screenfetch"
-    - "reflector --verbose -l 20 --sort rate -p https"
-    - "echo $CC"
-    - "touch test_file"
+  - "sudo screenfetch"
+  - "reflector --verbose -l 20 --sort rate -p https"
+  - "echo $CC"
+  - "touch test_file"
 
 script:
-  - "bash ./arch-travis.sh"
-  - "ls -l"
+- "bash ./arch-travis.sh"
+- "ls -l"

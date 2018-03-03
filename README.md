@@ -1,29 +1,32 @@
 # arch-travis [![Travis BuildStatus](https://travis-ci.org/mikkeloscar/arch-travis.svg?branch=master)](https://travis-ci.org/mikkeloscar/arch-travis)
 
-arch-travis provides a chroot based Arch Linux build environment for
+arch-travis provides a docker based Arch Linux build environment for
 [Travis-CI][travis-ci] builds. It supports a very simple (and limited)
 configuration based on `.travis.yml`.
 
 Example:
-```yml
+```yaml
 sudo: required
+
+services:
+- docker
 
 arch:
   repos:
-    - papyros=http://dash.papyros.io/repos/$repo/$arch
+  - papyros=http://dash.papyros.io/repos/$repo/$arch
   packages:
-    # pacman packages
-    - python
-    - perl
-    # aur packages
-    - go-git
-    # packages from papyros repo
-    - papyros-shell
+  # pacman packages
+  - python
+  - perl
+  # aur packages
+  - go-git
+  # packages from papyros repo
+  - papyros-shell
   script:
-    - "./build_script.sh"
+  - "./build_script.sh"
 
 script:
-  - "curl -s https://raw.githubusercontent.com/mikkeloscar/arch-travis/master/arch-travis.sh | bash"
+- "curl -s https://raw.githubusercontent.com/mikkeloscar/arch-travis/master/arch-travis.sh | bash"
 ```
 
 `arch.repos` defines a list of custom repositories.
@@ -34,8 +37,7 @@ installed before running the build.
 `arch.script` defines a list of scripts to run as part of the build. Anything
 defined in the `arch.script` list will run from the base of the repository as a
 normal user called `travis`. `sudo` is available as well as any packages
-installed in the setup. The path of the build dir (or repository base), is
-stored in the `TRAVIS_BUILD_DIR` environment variable inside the chroot.
+installed in the setup.
 
 `script` defines the scripts to be run by travis, this is where arch-travis is
 initialized.
@@ -77,45 +79,9 @@ custom repositories will be added before the default repositories.
 * Doesn't include `base` group packages. If you need anything
   from `base` just add it to the `arch.packages` list in `.travis.yml`.
 
-## Advanced configuration
-
-Apart from the basic `arch` entry in `.travis.yml` it is also possible to
-define some environment variables in order to control the chroot setup.
-
-The following variables are available:
-
-`ARCH_TRAVIS_CHROOT` name of the folder containing the chroot. (default is
-`root.x86_64`).
-
-`ARCH_TRAVIS_MIRRORS` Comma separated list of Arch Linux mirrors used by
-pacman. See list of available mirrors [here][arch-mirrors]. Omit the
-`/$repo/os/$arch` part of the mirrors when defining this variable.
-
-> Note some https mirrors are not supported due to [#4757][travis-issue-4757].
-
-`ARCH_TRAVIS_CLEAN_CHROOT` by default the chroot archive and chroot folder is
-left in `$TRAVIS_BUILD_DIR`, if you don't want this, then you can make
-arch-travis remove them by enabling `ARCH_TRAVIS_CLEAN_CHROOT`.
-
-`ARCH_TRAVIS_ARCH` Set the default architecture to use in the chroot. Valid
-values are `x86_64` (default) and `i686`.
-
-`ARCH_TRAVIS_CONFIRM_YES` when set, this configures `arch-travis` to always
-answer yes when installing packages. This is needed if you want to overwrite a
-default package e.g. `pacman-git` where pacaur will prompt `pacman-git and
-pacman are in conflict. Remove pacman? [y/N]`.
-
-To use, just add the variable to the `env` section of `.travis.yml`.
-
-```yml
-env:
-  - ARCH_TRAVIS_CHROOT="custom_root" ARCH_TRAVIS_CLEAN_CHROOT=1
-```
-
-
 ### clang support
 
-The default compiler available in the chroot is `gcc`, if you want to use
+The default compiler available in the environment is `gcc`, if you want to use
 `clang` instead just add the following to `.travis.yml` and arch-travis will
 export `CC=clang` in your build:
 
@@ -132,7 +98,11 @@ compiler: clang
 * [networkd-dispatcher](https://github.com/craftyguy/networkd-dispatcher)
 
 ## LICENSE
+<<<<<<< HEAD
 Copyright (C) 2016-2017  Mikkel Oscar Lyderik Larsen
+=======
+Copyright (C) 2018  Mikkel Oscar Lyderik Larsen
+>>>>>>> Update to use docker based environment
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
