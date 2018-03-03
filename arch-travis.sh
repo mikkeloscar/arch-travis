@@ -36,8 +36,6 @@ CONFIG_BUILD_SCRIPTS=$(encode_config arch script)
 CONFIG_PACKAGES=$(encode_config arch packages)
 CONFIG_REPOS=$(encode_config arch repos)
 
-set -x
-
 # force pull latest
 docker pull mikkeloscar/arch-travis
 
@@ -46,5 +44,5 @@ docker run --rm -v $(pwd):/build \
     -e CONFIG_BUILD_SCRIPTS="$CONFIG_BUILD_SCRIPTS" \
     -e CONFIG_PACKAGES="$CONFIG_PACKAGES" \
     -e CONFIG_REPOS="$CONFIG_REPOS" \
-    $(env | cut -f1 -d= | grep -v PATH | grep -v USER | grep -v HOME | sed 's/^/-e /') \
+    --env-file <(env | grep -v PATH | grep -v USER | grep -v HOME) \
     mikkeloscar/arch-travis
