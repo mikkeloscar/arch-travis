@@ -3,27 +3,26 @@ sudo: required
 language: c
 
 compiler:
-  - gcc
-  - clang
+- gcc
+- clang
 
 services:
-  - docker
+- docker
 
 arch:
   repos:
-    - archlinuxfr=http://repo.archlinux.fr/$arch
+  - archlinuxfr=http://repo.archlinux.fr/$arch
   packages:
-    - procps-ng
-    - reflector
-    # aur
-    - screenfetch-git
-    - pacman-git
+  - procps-ng
+  - reflector
+  # aur
+  - screenfetch-git
   script:
-    - "sudo screenfetch"
-    - "reflector --verbose -l 20 --sort rate -p https"
-    - "echo $CC"
-    - "touch test_file"
+  - "sudo screenfetch"
+  - "reflector --verbose -l 20 --sort rate -p https"
+  - "echo $CC"
+  - "touch test_file"
 
 script:
-  - "bash ./arch-travis-docker.sh"
-  - "ls -l"
+- "bash ./arch-travis.sh"
+- "ls -l"
