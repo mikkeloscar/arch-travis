@@ -50,6 +50,6 @@ RUN \
     rm -rf yay-bin && rm yay-bin.tar.gz
 
 # Add arch-travis script
-COPY docker.sh /usr/bin/arch-travis
+COPY init.sh /usr/bin/arch-travis
 
 ENTRYPOINT ["/usr/bin/arch-travis"]
