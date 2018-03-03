@@ -44,5 +44,5 @@ docker run --rm -v $(pwd):/build \
     -e CONFIG_BUILD_SCRIPTS="$CONFIG_BUILD_SCRIPTS" \
     -e CONFIG_PACKAGES="$CONFIG_PACKAGES" \
     -e CONFIG_REPOS="$CONFIG_REPOS" \
-    $(ruby -e 'ENV.each {|key, val| if not ["PATH","USER","HOME"].include?(key) then puts "-e #{key}" end}') \
+    $(ruby -e 'ENV.each {|key,_| if not ["PATH","USER","HOME"].include?(key) then puts "-e #{key}" end}') \
     mikkeloscar/arch-travis
