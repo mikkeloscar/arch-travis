@@ -46,7 +46,7 @@ add_repositories() {
 # install packages defined in .travis.yml
 install_packages() {
   for package in "${CONFIG_PACKAGES[@]}"; do
-    pacaur -Syu $package --noconfirm --noedit
+    yay -S $package --noconfirm
   done
 }
 
@@ -65,7 +65,7 @@ build_scripts() {
 
 install_c_compiler() {
   if [ "$TRAVIS_CC" != "gcc" ]; then
-    pacaur -S "$TRAVIS_CC" --noconfirm --noedit
+    yay -S "$TRAVIS_CC" --noconfirm
   fi
 }
 

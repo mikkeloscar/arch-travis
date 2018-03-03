@@ -2,11 +2,11 @@
 #
 #     docker build --rm=true -t mikkeloscar/arch-travis .
 
-FROM nfnty/arch-devel:latest
-MAINTAINER Mikkel Oscar Lyderik <mikkeloscar@gmail.com>
+FROM archlinux/base:latest
+MAINTAINER Mikkel Oscar Lyderik Larsen <m@moscar.net>
 
 # Setup build user/group
-ENV UGID='1001' UGNAME='travis'
+ENV UGID='2000' UGNAME='travis'
 RUN \
     groupadd --gid "$UGID" "$UGNAME" && \
     useradd --create-home --uid "$UGID" --gid "$UGID" --shell /usr/bin/false "${UGNAME}"
@@ -16,13 +16,17 @@ COPY contrib/etc/sudoers.d/$UGNAME /etc/sudoers.d/$UGNAME
 # Add pacman.conf template
 COPY contrib/etc/pacman.conf /etc/pacman.conf
 
+RUN cat /etc/pacman.d/mirrorlist
+
 RUN \
     # Update
-    pacman -Syu --noconfirm && \
+    pacman -Syu \
+        base-devel \
+        git \
+        reflector \
+        --noconfirm && \
     # Clean .pacnew files
-    find / -name "*.pacnew" -exec rename .pacnew '' '{}' \; && \
-    # Clean pkg cache
-    find /var/cache/pacman/pkg -mindepth 1 -delete
+    find / -name "*.pacnew" -exec rename .pacnew '' '{}' \;
 
 RUN \
     chmod 'u=r,g=r,o=' /etc/sudoers.d/$UGNAME && \
@@ -30,15 +34,20 @@ RUN \
 
 USER $UGNAME
 
+RUN \
+    sudo reflector --verbose -l 10 \
+        --sort rate --save /etc/pacman.d/mirrorlist && \
+    sudo pacman -Rs reflector --noconfirm
+
+ENV PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/bin/core_perl
+
 # install cower and pacaur
 RUN \
     cd /home/$UGNAME && \
-    curl -O https://aur.archlinux.org/cgit/aur.git/snapshot/cower.tar.gz && \
-    tar xf cower.tar.gz && \
-    cd cower && makepkg -is --skippgpcheck --noconfirm && cd .. && \
-    rm -rf cower && rm cower.tar.gz && \
-    cower -dd pacaur && \
-    cd pacaur && makepkg -is --noconfirm && cd .. && rm -rf pacaur
+    curl -O -s https://aur.archlinux.org/cgit/aur.git/snapshot/yay-bin.tar.gz && \
+    tar xf yay-bin.tar.gz && \
+    cd yay-bin && makepkg -is --skippgpcheck --noconfirm && cd .. && \
+    rm -rf yay-bin && rm yay-bin.tar.gz
 
 # Add arch-travis script
 COPY docker.sh /usr/bin/arch-travis

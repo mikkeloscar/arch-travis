@@ -1,9 +1,5 @@
 sudo: required
 
-env:
-  - ARCH_TRAVIS_CLEAN_CHROOT=1
-  - ARCH_TRAVIS_CONFIRM_YES=1
-
 language: c
 
 compiler:

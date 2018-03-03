@@ -22,7 +22,9 @@ CONFIG_BUILD_SCRIPTS=$(encode_config arch script)
 CONFIG_PACKAGES=$(encode_config arch packages)
 CONFIG_REPOS=$(encode_config arch repos)
 
+# force pull latest
 docker pull mikkeloscar/arch-travis
+
 docker run --rm -v $(pwd):/build \
     -e CC=$CC \
     -e CONFIG_BUILD_SCRIPTS="$CONFIG_BUILD_SCRIPTS" \
