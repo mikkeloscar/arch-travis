@@ -36,6 +36,8 @@ CONFIG_BUILD_SCRIPTS=$(encode_config arch script)
 CONFIG_PACKAGES=$(encode_config arch packages)
 CONFIG_REPOS=$(encode_config arch repos)
 
+set -x
+
 # force pull latest
 docker pull mikkeloscar/arch-travis
 
