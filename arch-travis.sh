@@ -39,11 +39,10 @@ CONFIG_REPOS=$(encode_config arch repos)
 # force pull latest
 docker pull mikkeloscar/arch-travis
 
-env
-
 docker run --rm -v $(pwd):/build \
     -e CC=$CC \
     -e CONFIG_BUILD_SCRIPTS="$CONFIG_BUILD_SCRIPTS" \
     -e CONFIG_PACKAGES="$CONFIG_PACKAGES" \
     -e CONFIG_REPOS="$CONFIG_REPOS" \
+    $(env | cut -f1 -d= | grep -v PATH | grep -v USER | grep -v HOME | sed 's/^/-e /') \
     mikkeloscar/arch-travis
