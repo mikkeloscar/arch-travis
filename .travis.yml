@@ -29,14 +29,11 @@ script:
 - bash ./arch-travis.sh
 - ls -l
 
-stages:
-- name: build-push
-  if: branch = master AND type NOT IN (pull_request)
-
 jobs:
   include:
   # push image to dockerhub
   - stage: build-push
+    if: branch = master AND type != pull_request
     script:
     - docker login -u $DOCKER_USER -p $DOCKER_PASS
     - docker build --rm=true -t mikkeloscar/arch-travis .
