@@ -15,14 +15,24 @@ arch:
   packages:
   - procps-ng
   - reflector
-  # aur
   - screenfetch-git
   script:
-  - "sudo screenfetch"
-  - "reflector --verbose -l 20 --sort rate -p https"
-  - "echo $CC"
-  - "touch test_file"
+  - sudo screenfetch
+  - reflector --verbose -l 20 --sort rate -p https
+  - echo $CC
+  - touch test_file
 
 script:
-- "bash ./arch-travis.sh"
-- "ls -l"
+# build/push fresh image
+- docker login -u $DOCKER_USER -p $DOCKER_PASS
+- docker build --rm=true -t mikkeloscar/arch-travis .
+- docker push mikkeloscar/arch-travis:latest
+
+# run arch-travis to test new image
+- bash ./arch-travis.sh
+- ls -l
+
+env:
+  global:
+  - secure: IBtG4wg6aBIDfj0lkpdikbRLId5TFBYARodLDS26FwzjAEK3Ohb9Vs0qRNq4loeHoKCHq/FbiVC7Jp2i9EdQHr596G3mTKPhIb67kZShtvK491iKGxVUzLxlw9xhxv8TlADDaor+DBQjyYe9np1ri2PiDRh2lQ6G/HWNfl3YnaO8gNNXxjvBsztjvGXA+scGx1JU03bFwHG7ha4AgtQ/Dr+UsssyolMMN1y87RrVDnv1Jx/hyl2gliO+7r56xOdh844Zrg4+gWFmLMSaU5xFt6kW57i3d9w1+rirhmChZhsQ/GWhPQAHz7QZOb79PbqCKeU/Y6BA8DI5dKAtSrdIsFj3pK5lY0qBKN2J0YhNH8fk/myjPCWMOsri+DXE5wChZXA5FhAwqZuIrGo+qnjXSE6uGPx6c6p4j8CnUY73jYr6C20GupVoL04xXoD1+9sidhRO+8ziR4Mjh3gMArUCC3Y+sWw72yg9oQUqT7Jb1BPnVD3doC2Fb6BMVbhfqZEdAUbK7i/ndXpMF98rXyKTlfYXHxFSEKfthRlKJoipiz1rxyrqXHj3JtAxt/FgCGT0y8o3vtj85jSgJZxfuXl1UdZ3lzRkCJQmMwbioaflH+cJZ1YBECqB5Et3n0oakE2dwwnxgcxNNgMWufUlId/3I7LijOJvCaqyhNGMAuR81iQ=
+  - secure: emeLxVVQwWI01HbJ+mAWO32v3YiMNdkmNOQnESVGosrFZ2nBVsT/67VRzdvZqW2xZ8pV5UVLqWT/itlRvBLBNYlEK8y1bUK8On0vCkAkwkWj+Ylgs2uFkIlvzqfyjlUSnPvpsHf5lSfbZkr+h86+UHOFgREvD7sz/iZfwziB+aHbenBZ0ZXZ6zwXxoTJonaFrA5lNFMiDRcirRrbBz/wFaDu2K9ZIvATIq4ELMiNqUESQXUGa2MKIqfs3+uh+wHsf1y0KVMwkRfosY03qoXRy2TmU+O0NPEplNrB1DYU8WnHDxgpaWcQa5iCIjzfplouNzCPZmlFlJH17TwpFHEkr6wIdEAt523lgjwZFC2UXEhPb6NHuVJZLo2e5j6cniRXunA/gjMjynA9rYohxephrb2HCj0rbSsW1u+i2pAccnDqDQx5LPgZnnTJT+4rvBqFCt+icJNJtcEGVHj3I72k+24kN1pbjOcjt9lQ6Z9y1GDe0PdTLn2vVcEg8eA4VyziuEIoB2kqgI9fH01T9U+49QtHaEN6ZtJZl/PbYHBEY2DM5z0XWtUIj1VUQFBnkp0XFKGwyHZoQTYUyias87j3vvWgymfWkC93hB1bVmus9zoty0O6ItQfROqP17CYp3SGBIHaFty7QollW7DH+2/LFWwFTX/4G6ysAtAVuIK86GI=
