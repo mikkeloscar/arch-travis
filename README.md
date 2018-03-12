@@ -96,6 +96,7 @@ compiler: clang
 
 * [sway](https://github.com/SirCmpwn/sway)
 * [networkd-dispatcher](https://github.com/craftyguy/networkd-dispatcher)
+* [aurora-fw](https://github.com/aurora-fw)
 
 ## LICENSE
 Copyright (C) 2016-2018  Mikkel Oscar Lyderik Larsen
