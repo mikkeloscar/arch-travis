@@ -49,8 +49,7 @@ build environment.
 
 * base-devel (group)
 * [git](https://www.archlinux.org/packages/extra/x86_64/git/)
-* [cower](https://aur.archlinux.org/packages/cower/)
-* [pacaur](https://aur.archlinux.org/packages/pacaur/)
+* [yay](https://aur.archlinux.org/packages/yay/)
 
 The following repositories are enabled by default.
 
