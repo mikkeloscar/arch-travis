@@ -23,14 +23,21 @@ arch:
   - touch test_file
 
 script:
-# build/push fresh image
-- docker login -u $DOCKER_USER -p $DOCKER_PASS
+# build new image
 - docker build --rm=true -t mikkeloscar/arch-travis .
-- docker push mikkeloscar/arch-travis:latest
-
 # run arch-travis to test new image
 - bash ./arch-travis.sh
 - ls -l
+
+jobs:
+  include:
+  # push image to dockerhub
+  - stage: build-push
+    if: branch = master
+    script:
+    - docker login -u $DOCKER_USER -p $DOCKER_PASS
+    - docker build --rm=true -t mikkeloscar/arch-travis .
+    - docker push mikkeloscar/arch-travis:latest
 
 env:
   global:
