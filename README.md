@@ -94,7 +94,7 @@ compiler: clang
 
 ## Projects using arch-travis
 
-* [sway](https://github.com/SirCmpwn/sway)
+* [Way Cooler](https://github.com/way-cooler/way-cooler)
 * [networkd-dispatcher](https://github.com/craftyguy/networkd-dispatcher)
 * [aurora-fw](https://github.com/aurora-fw)
 
