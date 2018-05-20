@@ -57,6 +57,11 @@ add_repositories() {
   fi
 }
 
+# upgrade system to avoid partial upgrade states
+upgrade_system() {
+  sudo pacman -Syu --noconfirm
+}
+
 # install packages defined in .travis.yml
 install_packages() {
   for package in "${CONFIG_PACKAGES[@]}"; do
@@ -95,6 +100,7 @@ echo "travis_fold:start:arch_travis"
 arch_msg "Setting up Arch environment"
 add_repositories
 
+upgrade_system
 install_packages
 
 if [ -n "$CC" ]; then
