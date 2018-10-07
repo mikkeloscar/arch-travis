@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-cd /build
+cd /build || exit
 
 if [ -n "$CC" ]; then
   # store travis CC
@@ -34,9 +34,9 @@ read_config() {
   CONFIG_PACKAGES=${CONFIG_PACKAGES//$sep/$'\n'}
   CONFIG_REPOS=${CONFIG_REPOS//$sep/$'\n'}
   IFS=$'\n'
-  CONFIG_BUILD_SCRIPTS=(${CONFIG_BUILD_SCRIPTS[@]})
-  CONFIG_PACKAGES=(${CONFIG_PACKAGES[@]})
-  CONFIG_REPOS=(${CONFIG_REPOS[@]})
+  CONFIG_BUILD_SCRIPTS=("${CONFIG_BUILD_SCRIPTS[@]}")
+  CONFIG_PACKAGES=("${CONFIG_PACKAGES[@]}")
+  CONFIG_REPOS=("${CONFIG_REPOS[@]}")
   IFS=$old_ifs
 }
 
@@ -44,7 +44,7 @@ read_config() {
 add_repositories() {
   if [ ${#CONFIG_REPOS[@]} -gt 0 ]; then
     for r in "${CONFIG_REPOS[@]}"; do
-      local splitarr=(${r//=/ })
+      local splitarr=("${r//=/ }")
       ((repo_line+=1))
       sudo sed -i "${repo_line}i[${splitarr[0]}]" /etc/pacman.conf
       ((repo_line+=1))
@@ -65,7 +65,7 @@ upgrade_system() {
 # install packages defined in .travis.yml
 install_packages() {
   for package in "${CONFIG_PACKAGES[@]}"; do
-    yay -S $package --noconfirm
+    yay -S "$package" --noconfirm
   done
 }
 
@@ -74,7 +74,7 @@ build_scripts() {
   if [ ${#CONFIG_BUILD_SCRIPTS[@]} -gt 0 ]; then
     for script in "${CONFIG_BUILD_SCRIPTS[@]}"; do
       echo "\$ $script"
-      eval $script
+      eval "$script"
     done
   else
     echo "No build scripts defined"
@@ -91,7 +91,8 @@ install_c_compiler() {
 arch_msg() {
   lightblue='\033[1;34m'
   reset='\e[0m'
-  echo -e "${lightblue}$@${reset}"
+  local args=("$@")
+  echo -e "${lightblue}${args[*]}${reset}"
 }
 
 read_config
