@@ -39,7 +39,7 @@ CONFIG_REPOS=$(encode_config arch repos)
 # force pull latest
 docker pull mikkeloscar/arch-travis
 
-mapfile -t envs < <(ruby -e 'ENV.each {|key,_| if not ["PATH","USER","HOME"].include?(key) then puts "-e #{key}" end}')
+mapfile -t envs < <(ruby -e 'ENV.each {|key,_| if not ["PATH","USER","HOME","GOROOT"].include?(key) then puts "-e #{key}" end}')
 
 docker run --rm -v "$(pwd):/build" \
     -e "CC=$CC" \
