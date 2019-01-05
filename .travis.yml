@@ -24,7 +24,7 @@ arch:
 
 script:
 # build new image
-- docker build --rm=true -t mikkeloscar/arch-travis .
+- docker build --rm=true -t mikkeloscar/arch-travis:latest .
 # run arch-travis to test new image
 - bash ./arch-travis.sh
 - ls -l
@@ -36,7 +36,7 @@ jobs:
     if: branch = master AND type != pull_request
     script:
     - docker login -u $DOCKER_USER -p $DOCKER_PASS
-    - docker build --rm=true -t mikkeloscar/arch-travis .
+    - docker build --rm=true -t mikkeloscar/arch-travis:latest .
     - docker push mikkeloscar/arch-travis:latest
 
 env:

@@ -44,7 +44,7 @@ read_config() {
 add_repositories() {
   if [ ${#CONFIG_REPOS[@]} -gt 0 ]; then
     for r in "${CONFIG_REPOS[@]}"; do
-      local splitarr=("${r//=/ }")
+      IFS=" " read -r -a splitarr <<< "${r//=/ }"
       ((repo_line+=1))
       sudo sed -i "${repo_line}i[${splitarr[0]}]" /etc/pacman.conf
       ((repo_line+=1))
@@ -65,7 +65,8 @@ upgrade_system() {
 # install packages defined in .travis.yml
 install_packages() {
   for package in "${CONFIG_PACKAGES[@]}"; do
-    yay -S "$package" --noconfirm
+    mapfile -t packages <<< "$package"
+    yay -S "${packages[@]}" --noconfirm
   done
 }
 

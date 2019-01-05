@@ -36,9 +36,6 @@ CONFIG_BUILD_SCRIPTS=$(encode_config arch script)
 CONFIG_PACKAGES=$(encode_config arch packages)
 CONFIG_REPOS=$(encode_config arch repos)
 
-# force pull latest
-docker pull mikkeloscar/arch-travis
-
 mapfile -t envs < <(ruby -e 'ENV.each {|key,_| if not ["PATH","USER","HOME","GOROOT"].include?(key) then puts "-e #{key}" end}')
 
 docker run --rm -v "$(pwd):/build" \
@@ -47,4 +44,4 @@ docker run --rm -v "$(pwd):/build" \
     -e CONFIG_PACKAGES="$CONFIG_PACKAGES" \
     -e CONFIG_REPOS="$CONFIG_REPOS" \
     "${envs[@]}" \
-    mikkeloscar/arch-travis
+    mikkeloscar/arch-travis:latest
