@@ -36,7 +36,11 @@ read_config() {
   IFS=$'\n'
   CONFIG_BUILD_SCRIPTS=("${CONFIG_BUILD_SCRIPTS[@]}")
   CONFIG_PACKAGES=("${CONFIG_PACKAGES[@]}")
-  CONFIG_REPOS=("${CONFIG_REPOS[@]}")
+  if [[ -z "${CONFIG_REPOS}" ]]; then
+      CONFIG_REPOS=()
+  else
+      CONFIG_REPOS=("${CONFIG_REPOS[@]}")
+  fi
   IFS=$old_ifs
 }
 
