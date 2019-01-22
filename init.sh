@@ -79,7 +79,7 @@ build_scripts() {
   if [ ${#CONFIG_BUILD_SCRIPTS[@]} -gt 0 ]; then
     for script in "${CONFIG_BUILD_SCRIPTS[@]}"; do
       echo "\$ $script"
-      eval "$script"
+      eval "$script" || exit $?
     done
   else
     echo "No build scripts defined"
