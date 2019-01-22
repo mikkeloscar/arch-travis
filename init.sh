@@ -70,7 +70,7 @@ upgrade_system() {
 install_packages() {
   for package in "${CONFIG_PACKAGES[@]}"; do
     mapfile -t packages <<< "$package"
-    yay -S "${packages[@]}" --noconfirm
+    yay -S "${packages[@]}" --noconfirm --needed
   done
 }
 
@@ -89,7 +89,7 @@ build_scripts() {
 
 install_c_compiler() {
   if [ "$TRAVIS_CC" != "gcc" ]; then
-    yay -S "$TRAVIS_CC" --noconfirm
+    yay -S "$TRAVIS_CC" --noconfirm --needed
   fi
 }
 
