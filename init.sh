@@ -19,8 +19,10 @@ cd /build || exit
 if [ -n "$CC" ]; then
   # store travis CC
   TRAVIS_CC=$CC
+  TRAVIS_CXX=$CXX
   # reset to gcc for building arch packages
   CC=gcc
+  CXX=g++
 fi
 
 # /etc/pacman.conf repository line
@@ -114,6 +116,7 @@ if [ -n "$CC" ]; then
 
   # restore CC
   CC=$TRAVIS_CC
+  CXX=$TRAVIS_CXX
 fi
 echo "travis_fold:end:arch_travis"
 echo ""
