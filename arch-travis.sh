@@ -40,6 +40,7 @@ mapfile -t envs < <(ruby -e 'ENV.each {|key,_| if not ["PATH","USER","HOME","GOR
 
 docker run --rm -v "$(pwd):/build" \
     -e "CC=$CC" \
+    -e "CXX=$CXX" \
     -e CONFIG_BUILD_SCRIPTS="$CONFIG_BUILD_SCRIPTS" \
     -e CONFIG_PACKAGES="$CONFIG_PACKAGES" \
     -e CONFIG_REPOS="$CONFIG_REPOS" \
