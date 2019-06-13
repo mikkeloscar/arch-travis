@@ -32,6 +32,7 @@ encode_config() {
 }
 
 # read travis config
+CONFIG_BEFORE_INSTALL=$(encode_config arch before_install)
 CONFIG_BUILD_SCRIPTS=$(encode_config arch script)
 CONFIG_PACKAGES=$(encode_config arch packages)
 CONFIG_REPOS=$(encode_config arch repos)
@@ -41,6 +42,7 @@ mapfile -t envs < <(ruby -e 'ENV.each {|key,_| if not ["PATH","USER","HOME","GOR
 docker run --rm -v "$(pwd):/build" \
     -e "CC=$CC" \
     -e "CXX=$CXX" \
+    -e CONFIG_BEFORE_INSTALL="$CONFIG_BEFORE_INSTALL" \
     -e CONFIG_BUILD_SCRIPTS="$CONFIG_BUILD_SCRIPTS" \
     -e CONFIG_PACKAGES="$CONFIG_PACKAGES" \
     -e CONFIG_REPOS="$CONFIG_REPOS" \

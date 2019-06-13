@@ -16,6 +16,8 @@ arch:
   - procps-ng
   - reflector
   - screenfetch-git
+  before_install:
+  - sudo sed -i '/#MAKEFLAGS=/c MAKEFLAGS="-j2"' /etc/makepkg.conf
   script:
   - sudo screenfetch
   - reflector --verbose -l 20 --sort rate -p https

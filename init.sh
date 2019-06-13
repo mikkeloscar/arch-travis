@@ -32,10 +32,12 @@ repo_line=70
 read_config() {
   local old_ifs=$IFS
   local sep='::::'
+  CONFIG_BEFORE_INSTALL=${CONFIG_BEFORE_INSTALL//$sep/$'\n'}
   CONFIG_BUILD_SCRIPTS=${CONFIG_BUILD_SCRIPTS//$sep/$'\n'}
   CONFIG_PACKAGES=${CONFIG_PACKAGES//$sep/$'\n'}
   CONFIG_REPOS=${CONFIG_REPOS//$sep/$'\n'}
   IFS=$'\n'
+  CONFIG_BEFORE_INSTALL=("${CONFIG_BEFORE_INSTALL[@]}")
   CONFIG_BUILD_SCRIPTS=("${CONFIG_BUILD_SCRIPTS[@]}")
   CONFIG_PACKAGES=("${CONFIG_PACKAGES[@]}")
   if [[ -z "${CONFIG_REPOS}" ]]; then
@@ -60,6 +62,16 @@ add_repositories() {
 
     # update repos
     sudo pacman -Syy
+  fi
+}
+
+# run before_install script defined in .travis.yml
+before_install() {
+  if [ ${#CONFIG_BEFORE_INSTALL[@]} -gt 0 ]; then
+    for script in "${CONFIG_BEFORE_INSTALL[@]}"; do
+      echo "\$ $script"
+      eval "$script" || exit $?
+    done
   fi
 }
 
@@ -108,6 +120,7 @@ echo "travis_fold:start:arch_travis"
 arch_msg "Setting up Arch environment"
 add_repositories
 
+before_install
 upgrade_system
 install_packages
 
