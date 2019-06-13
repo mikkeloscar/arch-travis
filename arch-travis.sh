@@ -31,15 +31,31 @@ encode_config() {
     echo "$enc"
 }
 
+# configure docker volumes
+configure_volumes() {
+    volumes=("$(travis_yml arch mount)")
+    [[ -z "${volumes[@]}" ]] && return 1
+    # resolve environment variables 
+    volumes=($(eval echo ${volumes[@]}))
+    # resolve relative paths
+    volumes=($(ruby -e "ARGV.each{|vol| puts vol.split(':').map{|path| File.expand_path(path)}.join(':')}" "${volumes[@]}"))
+    echo "Docker volumes: ${volumes[@]}" >&2
+    printf " -v %s" ${volumes[*]}
+}
+
 # read travis config
 CONFIG_BEFORE_INSTALL=$(encode_config arch before_install)
 CONFIG_BUILD_SCRIPTS=$(encode_config arch script)
 CONFIG_PACKAGES=$(encode_config arch packages)
 CONFIG_REPOS=$(encode_config arch repos)
+CONFIG_VOLUMES=$(configure_volumes)
 
 mapfile -t envs < <(ruby -e 'ENV.each {|key,_| if not ["PATH","USER","HOME","GOROOT"].include?(key) then puts "-e #{key}" end}')
 
-docker run --rm -v "$(pwd):/build" \
+
+docker run --rm \
+    -v "$(pwd):/build" \
+    ${CONFIG_VOLUMES} \
     -e "CC=$CC" \
     -e "CXX=$CXX" \
     -e CONFIG_BEFORE_INSTALL="$CONFIG_BEFORE_INSTALL" \

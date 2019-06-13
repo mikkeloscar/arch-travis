@@ -22,6 +22,8 @@ arch:
   - go-git
   # packages from papyros repo
   - papyros-shell
+  mount:
+  - ~/.pkg-cache:/var/cache/pacman/pkg
   before_install:
   - "sudo ln -s /dev/null /etc/pacman.d/hooks/package-cleanup.hook"
   script:
@@ -35,6 +37,9 @@ script:
 
 `arch.packages` defines a list of packages (from official repos or AUR) to be
 installed before running the build.
+
+`arch.mount` defines a list of shared folders (docker volumes) from travis host to build container.
+Format: `host_src:container_dst` (relative path and environment variables are supported)
 
 `arch.before_install` defines a list of scripts to run after system boots.
 It's purpose is to alter build environment before system update and packages
