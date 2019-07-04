@@ -21,14 +21,7 @@ travis_yml() {
 
 # encode config so it can be passed to docker in an environment var.
 encode_config() {
-    local old_ifs=$IFS
-    IFS=$'\n'
-    local sep="::::"
-    arr=("$(travis_yml "$@")")
-    enc="$(printf "${sep}%s" "${arr[@]}")"
-    enc="${enc:${#sep}}"
-    IFS=$old_ifs
-    echo "$enc"
+    base64 -w 0 <(travis_yml "$@")
 }
 
 # configure docker volumes

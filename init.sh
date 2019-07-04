@@ -28,23 +28,23 @@ fi
 # /etc/pacman.conf repository line
 repo_line=70
 
+decode_config() {
+  base64 -d <<<"$@"
+}
+
+# PS4 configuration line for 'bash -x' script execution
+bash_ps4() {
+  echo "readonly PS4='\\\$ ${FUNCNAME[1]}:\${LINENO} ---8<--- '";
+}
+
 # read arch-travis config from env
 read_config() {
   local old_ifs=$IFS
-  local sep='::::'
-  CONFIG_BEFORE_INSTALL=${CONFIG_BEFORE_INSTALL//$sep/$'\n'}
-  CONFIG_BUILD_SCRIPTS=${CONFIG_BUILD_SCRIPTS//$sep/$'\n'}
-  CONFIG_PACKAGES=${CONFIG_PACKAGES//$sep/$'\n'}
-  CONFIG_REPOS=${CONFIG_REPOS//$sep/$'\n'}
   IFS=$'\n'
-  CONFIG_BEFORE_INSTALL=("${CONFIG_BEFORE_INSTALL[@]}")
-  CONFIG_BUILD_SCRIPTS=("${CONFIG_BUILD_SCRIPTS[@]}")
-  CONFIG_PACKAGES=("${CONFIG_PACKAGES[@]}")
-  if [[ -z "${CONFIG_REPOS}" ]]; then
-      CONFIG_REPOS=()
-  else
-      CONFIG_REPOS=("${CONFIG_REPOS[@]}")
-  fi
+  CONFIG_BEFORE_INSTALL="$(decode_config "${CONFIG_BEFORE_INSTALL}")"
+  CONFIG_BUILD_SCRIPTS="$(decode_config "${CONFIG_BUILD_SCRIPTS}")"
+  CONFIG_PACKAGES="$(decode_config "${CONFIG_PACKAGES}")"
+  CONFIG_REPOS=($(decode_config "${CONFIG_REPOS}"))
   IFS=$old_ifs
 }
 
@@ -67,11 +67,8 @@ add_repositories() {
 
 # run before_install script defined in .travis.yml
 before_install() {
-  if [ ${#CONFIG_BEFORE_INSTALL[@]} -gt 0 ]; then
-    for script in "${CONFIG_BEFORE_INSTALL[@]}"; do
-      echo "\$ $script"
-      eval "$script" || exit $?
-    done
+  if [ -n "$CONFIG_BEFORE_INSTALL" ]; then
+    bash -xvec "$(bash_ps4); $CONFIG_BEFORE_INSTALL" 2>&1 || exit $?
   fi
 }
 
@@ -90,11 +87,8 @@ install_packages() {
 
 # run build scripts defined in .travis.yml
 build_scripts() {
-  if [ ${#CONFIG_BUILD_SCRIPTS[@]} -gt 0 ]; then
-    for script in "${CONFIG_BUILD_SCRIPTS[@]}"; do
-      echo "\$ $script"
-      eval "$script" || exit $?
-    done
+  if [ -n "$CONFIG_BUILD_SCRIPTS" ]; then
+    bash -xvec "$(bash_ps4); $CONFIG_BUILD_SCRIPTS" 2>&1 || exit $?
   else
     echo "No build scripts defined"
     exit 1
