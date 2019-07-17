@@ -55,5 +55,5 @@ docker run --rm \
     -e CONFIG_BUILD_SCRIPTS="$CONFIG_BUILD_SCRIPTS" \
     -e CONFIG_PACKAGES="$CONFIG_PACKAGES" \
     -e CONFIG_REPOS="$CONFIG_REPOS" \
-    "${envs[@]}" \
+    ${envs[@]} \
     mikkeloscar/arch-travis:latest
