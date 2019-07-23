@@ -43,7 +43,7 @@ CONFIG_PACKAGES=$(encode_config arch packages)
 CONFIG_REPOS=$(encode_config arch repos)
 CONFIG_VOLUMES=$(configure_volumes)
 
-mapfile -t envs < <(ruby -e 'ENV.each {|key,_| if not ["PATH","USER","HOME","GOROOT"].include?(key) then puts "-e #{key}" end}')
+mapfile -t envs < <(ruby -e 'ENV.each {|key,_| if not ["PATH","USER","HOME","GOROOT","LC_ALL"].include?(key) then puts "-e #{key}" end}')
 
 
 docker run --rm \
