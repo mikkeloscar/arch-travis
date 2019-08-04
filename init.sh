@@ -67,8 +67,11 @@ add_repositories() {
 
 # run before_install script defined in .travis.yml
 before_install() {
-  if [ -n "$CONFIG_BEFORE_INSTALL" ]; then
-    bash -xvec "$(bash_ps4); $CONFIG_BEFORE_INSTALL" 2>&1 || exit $?
+  if [ ${#CONFIG_BEFORE_INSTALL[@]} -gt 0 ]; then
+    for script in "${CONFIG_BEFORE_INSTALL[@]}"; do
+      echo "\$ $script"
+      eval "$script" || exit $?
+    done
   fi
 }
 
@@ -87,8 +90,11 @@ install_packages() {
 
 # run build scripts defined in .travis.yml
 build_scripts() {
-  if [ -n "$CONFIG_BUILD_SCRIPTS" ]; then
-    bash -xvec "$(bash_ps4); $CONFIG_BUILD_SCRIPTS" 2>&1 || exit $?
+  if [ ${#CONFIG_BUILD_SCRIPTS[@]} -gt 0 ]; then
+    for script in "${CONFIG_BUILD_SCRIPTS[@]}"; do
+      echo "\$ $script"
+      eval "$script" || exit $?
+    done
   else
     echo "No build scripts defined"
     exit 1
