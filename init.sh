@@ -39,13 +39,10 @@ bash_ps4() {
 
 # read arch-travis config from env
 read_config() {
-  local old_ifs=$IFS
-  IFS=$'\n'
-  CONFIG_BEFORE_INSTALL="$(decode_config "${CONFIG_BEFORE_INSTALL}")"
-  CONFIG_BUILD_SCRIPTS="$(decode_config "${CONFIG_BUILD_SCRIPTS}")"
-  CONFIG_PACKAGES="$(decode_config "${CONFIG_PACKAGES}")"
-  CONFIG_REPOS=($(decode_config "${CONFIG_REPOS}"))
-  IFS=$old_ifs
+  mapfile -t -d $'\0' CONFIG_BEFORE_INSTALL < <(decode_config "${CONFIG_BEFORE_INSTALL}")
+  mapfile -t -d $'\0' CONFIG_BUILD_SCRIPTS  < <(decode_config "${CONFIG_BUILD_SCRIPTS}")
+  mapfile -t -d $'\n' CONFIG_PACKAGES       < <(decode_config "${CONFIG_PACKAGES}")
+  mapfile -t -d $'\n' CONFIG_REPOS          < <(decode_config "${CONFIG_REPOS}")
 }
 
 # add custom repositories to pacman.conf
@@ -82,10 +79,9 @@ upgrade_system() {
 
 # install packages defined in .travis.yml
 install_packages() {
-  for package in "${CONFIG_PACKAGES[@]}"; do
-    mapfile -t packages <<< "$package"
-    yay -S "${packages[@]}" --noconfirm --needed
-  done
+  if [ ${#CONFIG_PACKAGES[@]} -gt 0 ]; then
+    yay -S "${CONFIG_PACKAGES[@]}" --noconfirm --needed
+  fi
 }
 
 # run build scripts defined in .travis.yml

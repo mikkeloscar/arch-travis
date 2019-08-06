@@ -14,14 +14,19 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-# read value from .travis.yml
+# read value from .travis.yml (separated by new line character)
 travis_yml() {
-  ruby -ryaml -e 'puts ARGV[1..-1].inject(YAML.load(File.read(ARGV[0]))) {|acc, key| acc[key] }' .travis.yml "$@"
+  ruby -ryaml -e 'print ARGV[1..-1].inject(YAML.load(File.read(ARGV[0]))) {|acc, key| acc[key] }.join("\n")' .travis.yml "$@"
+}
+
+# read value from .travis.yml (separated by null character)
+travis_yml_null() {
+  ruby -ryaml -e 'print ARGV[1..-1].inject(YAML.load(File.read(ARGV[0]))) {|acc, key| acc[key] }.join("\0")' .travis.yml "$@"
 }
 
 # encode config so it can be passed to docker in an environment var.
 encode_config() {
-    base64 -w 0 <(travis_yml "$@")
+    base64 -w 0 <( if [ "$1" == "--null" ]; then travis_yml_null "${@:2}"; else travis_yml "$@"; fi )
 }
 
 # configure docker volumes
@@ -37,8 +42,8 @@ configure_volumes() {
 }
 
 # read travis config
-CONFIG_BEFORE_INSTALL=$(encode_config arch before_install)
-CONFIG_BUILD_SCRIPTS=$(encode_config arch script)
+CONFIG_BEFORE_INSTALL=$(encode_config --null arch before_install)
+CONFIG_BUILD_SCRIPTS=$(encode_config --null arch script)
 CONFIG_PACKAGES=$(encode_config arch packages)
 CONFIG_REPOS=$(encode_config arch repos)
 CONFIG_VOLUMES=$(configure_volumes)
