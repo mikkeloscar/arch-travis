@@ -18,6 +18,9 @@ arch:
   - screenfetch-git
   mount:
   - ~/.pkg-cache:/var/cache/pacman/pkg
+  - ~/.ccache:~/.ccache
+# test space character in path
+  - $HOME/y ay:$HOME/y ay
   before_install:
   - sudo sed -i '/#MAKEFLAGS=/c MAKEFLAGS="-j2"' /etc/makepkg.conf
   script:

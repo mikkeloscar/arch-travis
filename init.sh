@@ -106,8 +106,7 @@ install_c_compiler() {
 arch_msg() {
   lightblue='\033[1;34m'
   reset='\e[0m'
-  local args=("$@")
-  echo -e "${lightblue}${args[*]}${reset}"
+  echo -e "${lightblue}$*${reset}"
 }
 
 read_config
