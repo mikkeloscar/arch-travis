@@ -28,22 +28,21 @@ fi
 # /etc/pacman.conf repository line
 repo_line=70
 
+decode_config() {
+  base64 -d <<<"$@"
+}
+
+# PS4 configuration line for 'bash -x' script execution
+bash_ps4() {
+  echo "readonly PS4='\\\$ ${FUNCNAME[1]}:\${LINENO} ---8<--- '";
+}
+
 # read arch-travis config from env
 read_config() {
-  local old_ifs=$IFS
-  local sep='::::'
-  CONFIG_BUILD_SCRIPTS=${CONFIG_BUILD_SCRIPTS//$sep/$'\n'}
-  CONFIG_PACKAGES=${CONFIG_PACKAGES//$sep/$'\n'}
-  CONFIG_REPOS=${CONFIG_REPOS//$sep/$'\n'}
-  IFS=$'\n'
-  CONFIG_BUILD_SCRIPTS=("${CONFIG_BUILD_SCRIPTS[@]}")
-  CONFIG_PACKAGES=("${CONFIG_PACKAGES[@]}")
-  if [[ -z "${CONFIG_REPOS}" ]]; then
-      CONFIG_REPOS=()
-  else
-      CONFIG_REPOS=("${CONFIG_REPOS[@]}")
-  fi
-  IFS=$old_ifs
+  mapfile -t -d $'\0' CONFIG_BEFORE_INSTALL < <(decode_config "${CONFIG_BEFORE_INSTALL}")
+  mapfile -t -d $'\0' CONFIG_BUILD_SCRIPTS  < <(decode_config "${CONFIG_BUILD_SCRIPTS}")
+  mapfile -t -d $'\n' CONFIG_PACKAGES       < <(decode_config "${CONFIG_PACKAGES}")
+  mapfile -t -d $'\n' CONFIG_REPOS          < <(decode_config "${CONFIG_REPOS}")
 }
 
 # add custom repositories to pacman.conf
@@ -63,6 +62,16 @@ add_repositories() {
   fi
 }
 
+# run before_install script defined in .travis.yml
+before_install() {
+  if [ ${#CONFIG_BEFORE_INSTALL[@]} -gt 0 ]; then
+    for script in "${CONFIG_BEFORE_INSTALL[@]}"; do
+      echo "\$ $script"
+      eval "$script" || exit $?
+    done
+  fi
+}
+
 # upgrade system to avoid partial upgrade states
 upgrade_system() {
   sudo pacman -Syu --noconfirm
@@ -70,10 +79,9 @@ upgrade_system() {
 
 # install packages defined in .travis.yml
 install_packages() {
-  for package in "${CONFIG_PACKAGES[@]}"; do
-    mapfile -t packages <<< "$package"
-    yay -S "${packages[@]}" --noconfirm --needed
-  done
+  if [ ${#CONFIG_PACKAGES[@]} -gt 0 ]; then
+    yay -S "${CONFIG_PACKAGES[@]}" --noconfirm --needed
+  fi
 }
 
 # run build scripts defined in .travis.yml
@@ -98,8 +106,7 @@ install_c_compiler() {
 arch_msg() {
   lightblue='\033[1;34m'
   reset='\e[0m'
-  local args=("$@")
-  echo -e "${lightblue}${args[*]}${reset}"
+  echo -e "${lightblue}$*${reset}"
 }
 
 read_config
@@ -108,6 +115,7 @@ echo "travis_fold:start:arch_travis"
 arch_msg "Setting up Arch environment"
 add_repositories
 
+before_install
 upgrade_system
 install_packages
 
