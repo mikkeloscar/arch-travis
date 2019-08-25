@@ -16,12 +16,12 @@
 
 # read value from .travis.yml (separated by new line character)
 travis_yml() {
-  ruby -ryaml -e 'print ARGV[1..-1].inject(YAML.load(File.read(ARGV[0]))) {|acc, key| acc[key] }.join("\n")' .travis.yml "$@"
+  ruby -ryaml -e 'input=ARGV[1..-1].inject(YAML.load(File.read(ARGV[0]))) {|acc, key| acc[key] }; print input.respond_to?(:join) ? input.join("\n") : input' .travis.yml "$@"
 }
 
 # read value from .travis.yml (separated by null character)
 travis_yml_null() {
-  ruby -ryaml -e 'print ARGV[1..-1].inject(YAML.load(File.read(ARGV[0]))) {|acc, key| acc[key] }.join("\0")' .travis.yml "$@"
+  ruby -ryaml -e 'input=ARGV[1..-1].inject(YAML.load(File.read(ARGV[0]))) {|acc, key| acc[key] }; print input.respond_to?(:join) ? input.join("\0") : input' .travis.yml "$@"
 }
 
 # encode config so it can be passed to docker in an environment var.
