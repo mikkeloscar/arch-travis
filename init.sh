@@ -80,7 +80,9 @@ upgrade_system() {
 # install packages defined in .travis.yml
 install_packages() {
   if [ ${#CONFIG_PACKAGES[@]} -gt 0 ]; then
-    yay -S "${CONFIG_PACKAGES[@]}" --noconfirm --needed --useask
+    for pkg in "${CONFIG_PACKAGES[@]}"; do
+      yay -S "$pkg" --noconfirm --needed --useask || exit $?
+    done
   fi
 }
 
