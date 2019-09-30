@@ -42,6 +42,16 @@ configure_volumes() (
     while read -r vol; do printf -- '-v "%s"\n' "$vol"; done<<<"${volumes[*]}"
 )
 
+# regression test for outdated arch-travis configuration scheme.
+{
+    if travis_yml arch script >/dev/null 2>&1; then
+      echo '*** WARNING! Your current arch-travis configuration is outdated'
+      echo '*** Update ".travis.yml": replacing "arch:" keyword with "archlinux:"'
+      echo '*** More info: https://github.com/mikkeloscar/arch-travis/issues/65'
+      exit 66
+    fi
+} >&2
+
 # read travis config
 CONFIG_BEFORE_INSTALL=$(encode_config --null archlinux before_install)
 CONFIG_BUILD_SCRIPTS=$(encode_config --null archlinux script)
