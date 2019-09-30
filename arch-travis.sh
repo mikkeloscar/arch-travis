@@ -32,7 +32,7 @@ encode_config() {
 # configure docker volumes
 configure_volumes() (
     IFS=$'\n'
-    mapfile -t volumes < <(travis_yml arch mount)
+    mapfile -t volumes < <(travis_yml archlinux mount)
     [[ -z "${volumes[*]}" ]] && return 1
     # expand environment variables
     mapfile -t volumes < <(while read -r vol; do eval echo -e "$vol"; done <<<"${volumes[*]}")
@@ -43,10 +43,10 @@ configure_volumes() (
 )
 
 # read travis config
-CONFIG_BEFORE_INSTALL=$(encode_config --null arch before_install)
-CONFIG_BUILD_SCRIPTS=$(encode_config --null arch script)
-CONFIG_PACKAGES=$(encode_config arch packages)
-CONFIG_REPOS=$(encode_config arch repos)
+CONFIG_BEFORE_INSTALL=$(encode_config --null archlinux before_install)
+CONFIG_BUILD_SCRIPTS=$(encode_config --null archlinux script)
+CONFIG_PACKAGES=$(encode_config archlinux packages)
+CONFIG_REPOS=$(encode_config archlinux repos)
 #ubuntu bash is to old to have mapfile -d syntax [sic!]
 mapfile -t CONFIG_VOLUMES < <(configure_volumes)
 

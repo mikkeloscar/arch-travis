@@ -11,7 +11,7 @@ sudo: required
 services:
 - docker
 
-arch:
+archlinux:
   repos:
   - papyros=http://dash.papyros.io/repos/$repo/$arch
   packages:
@@ -74,7 +74,7 @@ It is possible to use custom respositories by adding them to the `arch.repos`
 section of `.travis.yml` using the following format:
 
 ```yml
-arch:
+archlinux:
   repos:
     - repo-name=http://repo.com/path
 ```
