@@ -72,6 +72,12 @@ before_install() {
   fi
 }
 
+# update reflector to prevent dead mirror causing build to fail.
+update_reflector() {
+    sudo reflector --verbose -l 10 \
+        --sort rate --save /etc/pacman.d/mirrorlist
+}
+
 # upgrade system to avoid partial upgrade states
 upgrade_system() {
   sudo pacman -Syu --noconfirm
@@ -118,6 +124,7 @@ arch_msg "Setting up Arch environment"
 add_repositories
 
 before_install
+update_reflector
 upgrade_system
 install_packages
 
