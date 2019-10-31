@@ -36,8 +36,7 @@ USER $UGNAME
 
 RUN \
     sudo reflector --verbose -l 10 \
-        --sort rate --save /etc/pacman.d/mirrorlist && \
-    sudo pacman -Rs reflector --noconfirm
+        --sort rate --save /etc/pacman.d/mirrorlist
 
 ENV PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/bin/core_perl
 
