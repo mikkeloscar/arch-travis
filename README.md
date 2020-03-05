@@ -6,7 +6,7 @@ configuration based on `.travis.yml`.
 
 Example:
 ```yaml
-sudo: required
+os: linux
 
 services:
 - docker
@@ -85,7 +85,6 @@ custom repositories will be added before the default repositories.
 ### Limitations/tradeoffs
 
 * Increases build time with about 1-3 min.
-* Doesn't work on [travis container-based infrastructure][travis-container] because `sudo` is required.
 * Limited configuration.
 * Doesn't include `base` group packages. If you need anything
   from `base` just add it to the `arch.packages` list in `.travis.yml`.
@@ -125,6 +124,5 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 [travis-ci]: https://travis-ci.org
-[travis-container]: http://docs.travis-ci.com/user/workers/container-based-infrastructure/
 [arch-mirrors]: https://www.archlinux.org/mirrorlist/all/
 [travis-issue-4757]: https://github.com/travis-ci/travis-ci/issues/4757
