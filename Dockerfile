@@ -5,12 +5,6 @@
 FROM archlinux/base:latest
 MAINTAINER Mikkel Oscar Lyderik Larsen <m@moscar.net>
 
-# Setup build user/group
-ENV UGID='2000' UGNAME='travis'
-RUN \
-    groupadd --gid "$UGID" "$UGNAME" && \
-    useradd --create-home --uid "$UGID" --gid "$UGID" --shell /usr/bin/false "${UGNAME}"
-
 # copy sudoers file
 COPY contrib/etc/sudoers.d/$UGNAME /etc/sudoers.d/$UGNAME
 # Add pacman.conf template
@@ -31,6 +25,12 @@ RUN \
 RUN \
     chmod 'u=r,g=r,o=' /etc/sudoers.d/$UGNAME && \
     chmod 'u=rw,g=r,o=r' /etc/pacman.conf
+
+# Setup build user/group
+ENV UGID='2000' UGNAME='travis'
+RUN \
+    groupadd --gid "$UGID" "$UGNAME" && \
+    useradd --create-home --uid "$UGID" --gid "$UGID" --shell /usr/bin/false "${UGNAME}"
 
 USER $UGNAME
 
