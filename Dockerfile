@@ -2,13 +2,20 @@
 #
 #     docker build --rm=true -t mikkeloscar/arch-travis .
 
-FROM archlinux/base:latest
+FROM archlinux:latest
 MAINTAINER Mikkel Oscar Lyderik Larsen <m@moscar.net>
 
 # copy sudoers file
 COPY contrib/etc/sudoers.d/$UGNAME /etc/sudoers.d/$UGNAME
 # Add pacman.conf template
 COPY contrib/etc/pacman.conf /etc/pacman.conf
+
+# WORKAROUND for glibc 2.33 and old Docker
+# See https://github.com/actions/virtual-environments/issues/2658
+# Thanks to https://github.com/lxqt/lxqt-panel/pull/1562
+RUN patched_glibc=glibc-linux4-2.33-4-x86_64.pkg.tar.zst && \
+    curl -LO "https://repo.archlinuxcn.org/x86_64/$patched_glibc" && \
+    bsdtar -C / -xvf "$patched_glibc"
 
 RUN cat /etc/pacman.d/mirrorlist
 
