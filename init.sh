@@ -87,7 +87,7 @@ upgrade_system() {
 install_packages() {
   if [ ${#CONFIG_PACKAGES[@]} -gt 0 ]; then
     for pkg in "${CONFIG_PACKAGES[@]}"; do
-      yay -S "$pkg" --noconfirm --needed --useask --gpgflags "--keyserver hkp://pool.sks-keyservers.net" || exit $?
+      yay -S "$pkg" --noconfirm --needed --useask --gpgflags "--keyserver  hkps://keys.openpgp.org/" || exit $?
     done
   fi
 }
