@@ -1,5 +1,8 @@
 # arch-travis [![Travis BuildStatus](https://travis-ci.org/mikkeloscar/arch-travis.svg?branch=master)](https://travis-ci.org/mikkeloscar/arch-travis)
 
+**NO LONGER MAINTAINED!** - If you're interested in taking over this project,
+please reach out to me.
+
 arch-travis provides a docker based Arch Linux build environment for
 [Travis-CI][travis-ci] builds. It supports a very simple (and limited)
 configuration based on `.travis.yml`.
